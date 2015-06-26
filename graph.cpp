@@ -239,7 +239,7 @@ void GraphBuilder::connect_graph(){
         for ( size_t i_content_len = 1; i_content_len < (*it)->node_content.length(); ){
             if ((*it)->node_content[i_content_len]=='(' ||  start_of_tax_name((*it)->node_content,i_content_len) ){    
                 size_t j_content_len = ((*it)->node_content[i_content_len] == '(') ? Parenthesis_balance_index_forwards( (*it)->node_content, i_content_len ) + 1:
-                                                                                               i_content_len;
+                                                                                     i_content_len;
                 int child1_node_content_i = 0;
                 for ( ; j_content_len < (*it)->node_content.length(); j_content_len++){
                     child_node1[child1_node_content_i] = (*it)->node_content[j_content_len];
@@ -295,8 +295,6 @@ void GraphBuilder::print(){
         cout<<endl;
     }
 }
-
-
 
 
 /*! \brief enumerate the internal branches */

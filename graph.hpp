@@ -45,11 +45,11 @@ class GraphReader{
 
     void check_Parenthesis(string &in_str);
     void check_labeled( string in_str );
+    void extract_tax_and_tip_names();
     size_t Parenthesis_balance_index_backwards( string &in_str, size_t i );
     string label_interior_node(string in_str);
     string extract_One_node_content( string &in_str, size_t back_parenthesis_index );
     string extract_label(string &in_str, size_t i);
-    void extract_tax_and_tip_names();
 };
 
 bool start_of_tax_name(string in_str, size_t i);
