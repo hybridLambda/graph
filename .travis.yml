@@ -1,0 +1,18 @@
+language: cpp
+os:
+  - linux
+
+compiler:
+  - gcc
+
+before_install:
+  - echo $LANG
+  - echo $LC_ALL
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo add-apt-repository -y ppa:dns/gnu; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi 
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get update -qq; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -qqy automake g++-4.8 libcppunit-dev valgrind; fi
+script:
+  - make
+  - make unittest
+  - ./unittest

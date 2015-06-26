@@ -1,10 +1,10 @@
 /* 
  * hybrid-coal is used to compute gene tree probabilities given species network under coalescent process.
  * 
- * Copyright (C) 2010 -- 2014 Sha (Joe) Zhu
- * 
+ * Copyright (C) 2010 -- 2015 Sha (Joe) Zhu
+ *
  * This file is part of hybrid-coal
- * 
+ *
  * hybrid-coal is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,10 +14,11 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 
 #include "nodeContainer.hpp"
 #include <map>
@@ -102,26 +103,26 @@ void NodeContainer::add( Node* node ) {
 
 
 void NodeContainer::remove( Node *node ) {
-  --size_; 
-  if ( node->is_first() && node->is_last() ) {
-    this->set_first(NULL);
-    this->set_last(NULL);
-  }
-  else if ( node->is_first() ) {
-    this->set_first(node->next());
-    node->next()->set_previous(NULL);
-  }
-  else if ( node->is_last() ) {
-    this->set_last(node->previous());
-    node->previous()->set_next(NULL);
-  }
-  else {
-    node->previous()->set_next(node->next());
-    node->next()->set_previous(node->previous());
-  }
-  
-  delete node;
-  //assert( this->sorted() );
+    --size_; 
+    if ( node->is_first() && node->is_last() ) {
+        this->set_first(NULL);
+        this->set_last(NULL);
+    }
+    else if ( node->is_first() ) {
+        this->set_first(node->next());
+        node->next()->set_previous(NULL);
+    }
+    else if ( node->is_last() ) {
+        this->set_last(node->previous());
+        node->previous()->set_next(NULL);
+    }
+    else {
+        node->previous()->set_next(node->next());
+        node->next()->set_previous(node->previous());
+    }
+
+    delete node;
+    //assert( this->sorted() );
 }
 
 
@@ -177,8 +178,8 @@ void NodeContainer::add_before(Node* add, Node* before){
 }
 
 void swap(NodeContainer& a, NodeContainer& b) {
-  using std::swap;
-  swap(a.first_node_, b.first_node_);
-  swap(a.last_node_, b.last_node_);
-  swap(a.size_, b.size_);
+    using std::swap;
+    swap(a.first_node_, b.first_node_);
+    swap(a.last_node_, b.last_node_);
+    swap(a.size_, b.size_);
 }
