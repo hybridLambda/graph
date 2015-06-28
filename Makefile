@@ -6,7 +6,7 @@ SOURCE = graph.cpp nodeContainer.cpp node.cpp
 .PHONY: all
 all: unittest
 
-unittests_CXXFLAGS = -DUNITTEST -DNDEBUG -std=c++0x -DVERSION=\"${VERSION}\"
+unittests_CXXFLAGS = -DUNITTEST -std=c++0x -DVERSION=\"${VERSION}\"
 unittests_LDADD = -lcppunit -ldl
 
 test_src = test_graphreader.cpp test_graphbuilder.cpp  ${SOURCE}
@@ -16,7 +16,7 @@ unittest: graph.cpp nodeContainer.cpp node.cpp graph.cpp nodeContainer.hpp node.
 
 .PHONY: clean
 clean:
-	rm -f topo topo_dbg
+	rm -f unittest
 
 .PHONY: clean_all
 clean_all: clean

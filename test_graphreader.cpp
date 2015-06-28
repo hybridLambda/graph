@@ -28,13 +28,13 @@
 
 class TestGraphReader : public CppUnit::TestCase {
 
-  CPPUNIT_TEST_SUITE( TestGraphReader );
-  CPPUNIT_TEST ( testConstructor );
-  CPPUNIT_TEST_SUITE_END();
- private:
+    CPPUNIT_TEST_SUITE( TestGraphReader );
+    CPPUNIT_TEST ( testConstructor );
+    CPPUNIT_TEST_SUITE_END();
+  private:
 
- public:
-  void setUp() {
+  public:
+    void setUp() {
         return;
     }
 
@@ -43,9 +43,18 @@ class TestGraphReader : public CppUnit::TestCase {
     }
 
     void testConstructor(){
+        string badStr1 = "((A:1,B:1):1,c:2;";
+        CPPUNIT_ASSERT_THROW(GraphReader testGraph(badStr1), ParenthesisNotBalanced);
 
+        string badStr2 = "((A:1,B:1),c:2);";
+        CPPUNIT_ASSERT_THROW(GraphReader testGraph(badStr2), BranchLengthUnGiven);
+
+        string goodStr1 = "((A:1,B:1):1,c:2);";
+        CPPUNIT_ASSERT_NO_THROW(GraphReader testGraph(goodStr1));
+
+        string goodStr2 = "((A:1,B:1)int:1,c:2);";
+        CPPUNIT_ASSERT_NO_THROW(GraphReader testGraph(goodStr2));
     }
-
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( TestGraphReader );

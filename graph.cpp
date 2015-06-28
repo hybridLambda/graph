@@ -29,31 +29,35 @@ GraphReader::GraphReader ( string in_str ){
 
     // Try to use string iterator for this...
     size_t found_bl = this->net_str.find(':');
-    for ( size_t i_str_len = 1; i_str_len < this->net_str.size(); ){
-        if ( this->net_str[i_str_len]=='e' && ( this->net_str[i_str_len+1]=='-' || this->net_str[i_str_len+1]=='+' ) ){
-            i_str_len++;
+    for ( size_t charPosition = 1; charPosition < this->net_str.size(); ){
+        if ( this->net_str[charPosition]=='e' && ( this->net_str[charPosition+1]=='-' || this->net_str[charPosition+1]=='+' ) ){
+            charPosition++;
         }
-        else if ( start_of_tax_name( this->net_str, i_str_len) ){
-            size_t str_start_index = i_str_len;
-            string label = extract_label( this->net_str, i_str_len );
+        else if ( start_of_tax_name( this->net_str, charPosition) ){
+            size_t str_start_index = charPosition;
+            string label = extract_label( this->net_str, charPosition );
             this->node_labels.push_back(label);
             
             string node_content = ( this->net_str[str_start_index-1]==')' ) ? extract_One_node_content ( this->net_str, str_start_index-1 )
                                                                             : label ;
             node_contents.push_back(node_content);
 
-            i_str_len += label.size();
+            charPosition += label.size();
 
             string brchlen;
             if ( found_bl != string::npos ){
-                size_t found=min(min( this->net_str.find(",",i_str_len+1), this->net_str.find(")",i_str_len+1)), this->net_str.size());
-                brchlen = this->net_str.substr(i_str_len+1,found-i_str_len-1);
+                if ( this->net_str[charPosition] != ':' ){
+                    throw BranchLengthUnGiven (label);
+                }
+                assert ( this->net_str[charPosition] == ':' );
+                size_t found=min(min( this->net_str.find(",",charPosition+1), this->net_str.find(")",charPosition+1)), this->net_str.size());
+                brchlen = this->net_str.substr(charPosition+1,found-charPosition-1);
             }
             found_bl = this->net_str.find(":", found_bl+1);
             brchlens.push_back(brchlen);
         }
         else {
-            i_str_len++;
+            charPosition++;
         }
     }
     this->extract_tax_and_tip_names();
@@ -68,7 +72,7 @@ void GraphReader::check_Parenthesis( string &in_str ){
         else if (in_str[i] == ')') num_b--;
         else continue;
     }
-    if ( num_b != 0 ) throw std::invalid_argument(in_str + "Parenthesis not balanced!" );
+    if ( num_b != 0 ) throw ParenthesisNotBalanced(in_str);
 }
 
 
@@ -517,9 +521,9 @@ size_t end_of_label_or_bl( string &in_str, size_t i ){
     
 void readNextStringto( string &readto, int& argc_i, int argc_, char * const* argv_ ){
     argc_i++;
-    if (argc_i >= argc_) throw std::invalid_argument(std::string("Not enough parameters when parsing options: ") + argv_[argc_i-1]); 
+    if (argc_i >= argc_) throw NotEnoughArg( argv_[argc_i-1] );
     readto = std::string(argv_[argc_i]);
-    if ( readto[0] == '-' ) throw std::invalid_argument(std::string("Not enough parameters when parsing options: ") + argv_[argc_i-1]);
+    if ( readto[0] == '-' ) throw NotEnoughArg( argv_[argc_i-1] );
 }
 
 
