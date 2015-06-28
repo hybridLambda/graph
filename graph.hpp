@@ -62,7 +62,7 @@ struct InvalidInput : public exception {
     this->reason   = "";
   }
   ~InvalidInput(){}
-  const char * what ( ) const throw () {
+  virtual const char * what ( ) const throw () {
     string throwMsg = this->reason + this->src;
     return throwMsg.c_str();
   }
