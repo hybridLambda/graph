@@ -61,7 +61,7 @@ struct InvalidInput : public exception {
     this->src      = str;
     this->reason   = "";
   }
-  //~InvalidInput(){}
+  ~InvalidInput(){}
   virtual const char * what ( ) const throw () {
     string throwMsg = this->reason + this->src;
     return throwMsg.c_str();
@@ -73,7 +73,7 @@ struct NotEnoughArg : public InvalidInput{
   NotEnoughArg( string str ):InvalidInput( str ){
     this->reason = "Not enough parameters when parsing option: ";
   }
-  //~NotEnoughArg(){}
+  ~NotEnoughArg(){}
 };
 
 
@@ -81,13 +81,13 @@ struct UnknowArg : public InvalidInput{
   UnknowArg( string str ):InvalidInput( str ){
     this->reason = "Unknow option: ";
   }
-  //~UnknowArg(){}
+  ~UnknowArg(){}
 };
 
 
 struct GraphException : public InvalidInput{
   GraphException( string str ):InvalidInput( str ){}
-  //~GraphException(){}
+  ~GraphException(){}
 };
 
 
