@@ -25,7 +25,6 @@
 #include <vector>
 #include <string>
 #include <cassert>
-#include <stdexcept>
 #include <valarray>
 
 using namespace std;

@@ -22,6 +22,7 @@
 #include "nodeContainer.hpp"
 #include <valarray>
 #include <fstream>
+#include "exceptions.hpp"
 
 #ifndef GRAPH
 #define GRAPH
@@ -53,57 +54,6 @@ class GraphReader{
     string extract_label(string &in_str, size_t i);
 };
 
-
-struct InvalidInput : public exception {
-  string src;
-  string reason;
-  InvalidInput( string str ){
-    this->src      = str;
-    this->reason   = "";
-  }
-  ~InvalidInput(){}
-  virtual const char * what ( ) const throw () {
-    string throwMsg = this->reason + this->src;
-    return throwMsg.c_str();
-  }
-};
-
-
-struct NotEnoughArg : public InvalidInput{
-  NotEnoughArg( string str ):InvalidInput( str ){
-    this->reason = "Not enough parameters when parsing option: ";
-  }
-  ~NotEnoughArg(){}
-};
-
-
-struct UnknowArg : public InvalidInput{
-  UnknowArg( string str ):InvalidInput( str ){
-    this->reason = "Unknow option: ";
-  }
-  ~UnknowArg(){}
-};
-
-
-struct GraphException : public InvalidInput{
-  GraphException( string str ):InvalidInput( str ){}
-  ~GraphException(){}
-};
-
-
-struct BranchLengthUnGiven : public GraphException{
-  BranchLengthUnGiven( string str ):GraphException( str ){
-    this->reason = "Branch length was not provided at node : ";
-  }
-  ~BranchLengthUnGiven(){}
-};
-
-struct ParenthesisNotBalanced : public GraphException{
-  ParenthesisNotBalanced( string str ):GraphException( str ){
-    this->reason = "Parenthesis not balanced: ";
-  }
-  ~ParenthesisNotBalanced(){}
-};
 
 bool start_of_tax_name(string in_str, size_t i);
 
