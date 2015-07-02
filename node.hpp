@@ -45,9 +45,33 @@ using namespace std;
  */
 
 enum NAMETYPE { TAXA, TIP };
+
     
-// use ChildContainer as a new class for the child nodes? we will need to include pointers to indicate the previous child and the next child.
-//class NodeContainer;
+class Edge {
+  friend class Node;
+  friend class GraphBuilder;
+    size_t edgeName_;
+    double branchLength_;
+    // Consider to use member to indicate the probability as well ...
+    
+    double bl() const { return this->branchLength_;}
+    void setLength ( double bl ){ this->branchLength_ = bl; }
+    
+    size_t label() const {return this->edgeName_;}
+    void setName( size_t name ) { this->edgeName_ = name; }
+    
+    void setBothNameAndLength( size_t name, double bl){
+        this->setName ( name );
+        this->setLength ( bl );
+    }
+    
+    Edge(){
+        this->edgeName_     = 0;
+        this->branchLength_ = 0.0;
+    }
+    ~Edge(){}
+};
+
 
 class Node {
     friend class NodeIterator;
@@ -62,28 +86,20 @@ class Node {
   public:
     ~Node(){};
     // Getters and Setters
-    double height() const { return this->height_;} // This has no use for hybrid-coal
-    void set_height ( double h ){ this->height_ = h; }// This has no use for hybrid-coal
+    //double height() const { return this->height_;} // This has no use for hybrid-coal
+    //void set_height ( double h ){ this->height_ = h; }// This has no use for hybrid-coal
     
-    double brchlen1() const { return this->brchlen1_;}
-    void set_brchlen1 ( double bl ){ this->brchlen1_ = bl; }
-    
-    double brchlen2() const { return this->brchlen2_;}
-    void set_brchlen2 ( double bl ){ this->brchlen2_ = bl; }
-
-    string label; /*!< \brief String label of a node, each node has unique label */
+    Edge edge1;
+    Edge edge2;
+    string nodeName; /*!< \brief String label of a node, each node has unique name */
     //size_t node_index; /*!< \brief node index in the array, \todo use this more often!!!*/
-    string node_content; /*!< \brief node content, the subtree string at this node */
+    string subTreeStr; /*!< \brief node content, the subtree string at this node */
     bool hybrid() const { return ( this->parent2() != NULL ) ;} /*!< \brief Hybrid node only, indicator of a hybrid node */
     
   private:    
     // Members
     size_t rank_;     /*!< \brief rank of the node, tip node has rank one, the root has the highest rank */    
     bool visited_;
-    size_t edge_;    /*!< \brief numbering the branch */
-    size_t edge2_;   /*!< \brief Hybrid node only, numbering the branch between the node and its second parent */
-    double brchlen1_; /*!< \brief Branch length */
-    double brchlen2_;/*!< \brief Hybrid node only, Branch length to the second parent*/
 
     valarray < size_t > taxa_below;
     valarray < size_t > samples_below; // tips_below
@@ -99,9 +115,8 @@ class Node {
     int num_descndnt_interior; /*!< \brief number of the interior nodes, that are descendant from this node \todo to be replaced by interior_nodes_below.size()? */
     size_t NumberOfInteriorNodesBelow() const { return this->interior_nodes_below.size(); }
     vector <double> path_time; 
-    double height_; /*!< \brief distance to the bottom of the tree */  // This has no use for hybrid-coal
-        
-    
+    //double height_; /*!< \brief distance to the bottom of the tree */  // This has no use for hybrid-coal
+            
     bool is_tip_; /*!< \brief Indicator of tip nodes. It's true, if it is a tip node, otherwise it is false. */
     bool is_tip() const { return this->is_tip_ ;}
     bool is_below_hybrid_; //bool descndnt_of_hybrid; /*!< \brief Indicator of descendant of hybrid nodes. It's true, if it is a descendant of hybrid nodes; false, otherwise. */
@@ -110,16 +125,16 @@ class Node {
     Node* parent2_; /*!< \brief Hybrid node only, pointer to its second parent node. */
     //double prob_to_hybrid_left; /*!< \brief Hybrid node only, the probability that a lineage goes to the left */
     
-    string name; /*!< \brief Name of a node, this is not unique for nodes. e.g. if its label is A_1, name is A */
+    string nodeClass; /*!< \brief Name of a node, this is not unique for nodes. e.g. if its label is A_1, name is A */
     
     //vector <size_t> Net_node_contains_gt_node1; /*!< Used while simulation, check if a Network node contains a gene tree node */
     //vector <size_t> Net_node_contains_gt_node2; /*!< Used while simulation, check if a Network node contains a gene tree node */
         
-    size_t edge() const {return this->edge_;}
-    void setEdge( size_t num ) { this->edge_ = num; }
+    //size_t edge() const {return this->edge_;}
+    //void setEdge( size_t num ) { this->edge_ = num; }
     
-    size_t edge2() const {return this->edge2_;}
-    void setEdge2( size_t num ) { this->edge2_ = num; }
+    //size_t edge2() const {return this->edge2_;}
+    //void setEdge2( size_t num ) { this->edge2_ = num; }
     
     bool visited() const { return this->visited_; }
     void set_visited ( bool TorF ){ this->visited_ = TorF; }
@@ -148,7 +163,7 @@ class Node {
     //Node (); /*!< \brief Initialize Node class*/
     Node ( size_t max_of_taxa,
            size_t max_of_sample, // number of tip
-           string label,
+           string nodeName,
            string content,
            double bl,
            bool tip );
@@ -163,8 +178,8 @@ class Node {
     //bool find_descndnt ( string &name, NAMETYPE type );
     
     double extract_hybrid_para(){
-        size_t hash_index = this->label.find('#');
-        return strtod( this->label.substr(hash_index+1).c_str(), NULL) ;
+        size_t hash_index = this->nodeName.find('#');
+        return strtod( this->nodeName.substr(hash_index+1).c_str(), NULL) ;
     }   
 };
 

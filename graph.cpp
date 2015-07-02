@@ -38,9 +38,9 @@ GraphReader::GraphReader ( string in_str ){
             string label = extract_label( this->net_str, charPosition );
             this->node_labels.push_back(label);
             
-            string node_content = ( this->net_str[str_start_index-1]==')' ) ? extract_One_node_content ( this->net_str, str_start_index-1 )
+            string subTreeStr = ( this->net_str[str_start_index-1]==')' ) ? extract_One_subTreeStr ( this->net_str, str_start_index-1 )
                                                                             : label ;
-            node_contents.push_back(node_content);
+            subTreeStrs.push_back(subTreeStr);
 
             charPosition += label.size();
 
@@ -82,7 +82,7 @@ string GraphReader::extract_label( string &in_str, size_t i ){
 }
 
 
-string GraphReader::extract_One_node_content( string &in_str, size_t back_parenthesis_index ){
+string GraphReader::extract_One_subTreeStr( string &in_str, size_t back_parenthesis_index ){
     size_t front_parenthesis_index = Parenthesis_balance_index_backwards( in_str, back_parenthesis_index );
     return in_str.substr ( front_parenthesis_index, back_parenthesis_index - front_parenthesis_index + 1);
 }
@@ -131,7 +131,7 @@ string GraphReader::label_interior_node(string in_str /*!< input newick form str
 
 void GraphReader::extract_tax_and_tip_names(){
     for ( size_t i = 0; i < node_labels.size(); i++ ){
-        if ( node_labels[i] != node_contents[i]) continue;         // skip interior nodes
+        if ( node_labels[i] != subTreeStrs[i]) continue;         // skip interior nodes
         if ( node_labels[i].find("#") != string::npos ) continue;  // skip hybrid nodes
         if ( node_labels[i].find("_") > 0 ){
             string node_name = node_labels[i].substr( 0, node_labels[i].find("_"));
@@ -178,7 +178,7 @@ GraphBuilder::GraphBuilder(string &in_str /*! input (extended) newick form strin
 
 
 void GraphBuilder::init(){
-    this->current_enum_ = 0;
+    this->tmpEdgeNameLabel_ = 0;
     this->is_Net = false;
     this->is_ultrametric = true;
 }
@@ -187,11 +187,11 @@ void GraphBuilder::init(){
 void GraphBuilder::initialize_nodes( string &in_str ){
     this->Tree_info = new GraphReader ( in_str );
     for ( size_t i = 0 ; i < Tree_info->brchlens.size(); i++ ){
-        bool is_tip = ( Tree_info->node_labels[i] == Tree_info->node_contents[i] && Tree_info->node_labels[i].find("#") == string::npos);
+        bool is_tip = ( Tree_info->node_labels[i] == Tree_info->subTreeStrs[i] && Tree_info->node_labels[i].find("#") == string::npos);
         Node * node = new Node ( Tree_info->tax_name.size(),
                                  Tree_info->tip_name.size(),
                                  Tree_info->node_labels[i],
-                                 Tree_info->node_contents[i],
+                                 Tree_info->subTreeStrs[i],
                                  strtod( Tree_info->brchlens[i].c_str(), NULL),
                                  is_tip );
         this->nodes_.add ( node );
@@ -222,15 +222,15 @@ void GraphBuilder::remove_repeated_hybrid_node(){
         NodeIterator it_j ( (*it_i)->next() );
         for ( ; it_j.good(); ++it_j){
             if ( (*it_j)->next() == NULL ) break;
-            if ( (*it_i)->label != (*it_j)->label ) continue;            
-            dout << "Remove " << (*it_j)->label <<" "<< (*it_j)->node_content <<endl;
-            if ( (*it_j)->node_content[0] == '(' ){                
-                (*it_i)->node_content = (*it_j)->node_content;
+            if ( (*it_i)->nodeName != (*it_j)->nodeName ) continue;            
+            dout << "Remove " << (*it_j)->nodeName <<" "<< (*it_j)->subTreeStr <<endl;
+            if ( (*it_j)->subTreeStr[0] == '(' ){                
+                (*it_i)->subTreeStr = (*it_j)->subTreeStr;
             }
-            (*it_i)->set_brchlen2 ( (*it_j)->brchlen1() );
+            (*it_i)->edge2.setLength ( (*it_j)->edge1.bl() );
             break;
         }        
-        if ( (*it_j)->label == (*it_i)->label ) this->nodes_.remove( (*it_j) );
+        if ( (*it_j)->nodeName == (*it_i)->nodeName ) this->nodes_.remove( (*it_j) );
     }
 }
 
@@ -239,28 +239,28 @@ void GraphBuilder::remove_repeated_hybrid_node(){
 
 void GraphBuilder::connect_graph(){
     for ( auto it = nodes_.iterator(); it.good(); ++it){
-        dout << " node " << (*it) << ": " << (*it)->label <<"\t"<<(*it)->node_content<<endl;
-        if ( (*it)->node_content[0] != '(' ) continue;
+        dout << " node " << (*it) << ": " << (*it)->nodeName <<"\t"<<(*it)->subTreeStr<<endl;
+        if ( (*it)->subTreeStr[0] != '(' ) continue;
         
-        char child_node1[(*it)->node_content.length()];
-        for ( size_t i_content_len = 1; i_content_len < (*it)->node_content.length(); ){
-            if ((*it)->node_content[i_content_len]=='(' ||  start_of_tax_name((*it)->node_content,i_content_len) ){    
-                size_t j_content_len = ((*it)->node_content[i_content_len] == '(') ? Parenthesis_balance_index_forwards( (*it)->node_content, i_content_len ) + 1:
+        char child_node1[(*it)->subTreeStr.length()];
+        for ( size_t i_content_len = 1; i_content_len < (*it)->subTreeStr.length(); ){
+            if ((*it)->subTreeStr[i_content_len]=='(' ||  start_of_tax_name((*it)->subTreeStr,i_content_len) ){    
+                size_t j_content_len = ((*it)->subTreeStr[i_content_len] == '(') ? Parenthesis_balance_index_forwards( (*it)->subTreeStr, i_content_len ) + 1:
                                                                                      i_content_len;
-                int child1_node_content_i = 0;
-                for ( ; j_content_len < (*it)->node_content.length(); j_content_len++){
-                    child_node1[child1_node_content_i] = (*it)->node_content[j_content_len];
-                    char stop = (*it)->node_content[j_content_len+1];
+                int child1_subTreeStr_i = 0;
+                for ( ; j_content_len < (*it)->subTreeStr.length(); j_content_len++){
+                    child_node1[child1_subTreeStr_i] = (*it)->subTreeStr[j_content_len];
+                    char stop = (*it)->subTreeStr[j_content_len+1];
                     if ( stop == ',' || stop == ')' || stop == ':'){
-                        child_node1[child1_node_content_i+1]='\0';
+                        child_node1[child1_subTreeStr_i+1]='\0';
                         break;
                     }
-                    child1_node_content_i++;
+                    child1_subTreeStr_i++;
                 }
                 string child_node1_str = child_node1;        
                 i_content_len = j_content_len + 2;
                 for ( auto it_i = nodes_.iterator(); it_i.good(); ++it_i){
-                        if (child_node1_str == (*it_i)->label) {
+                        if (child_node1_str == (*it_i)->nodeName) {
                         (*it)->add_child( (*it_i) );
                         //dout << "node " << &this->nodes_[i] << " has child "<< &this->nodes_[j]<<endl;
                     }
@@ -309,15 +309,15 @@ void GraphBuilder::enumerate_internal_branch( Node * node ) {
     if ( node->is_tip() ) return;
 
     if ( node->visited() ){
-        this->current_enum_ ++;
-        node->setEdge2( current_enum_ );
+        this->tmpEdgeNameLabel_ ++;
+        node->edge2.setName( tmpEdgeNameLabel_ );
     } else{
         for ( size_t i = 0; i < node->child.size(); i++ ){
             this->enumerate_internal_branch( node->child[i] );
         }
         node->set_visited( true );
-        this->current_enum_ ++;
-        node->setEdge( current_enum_ );
+        this->tmpEdgeNameLabel_ ++;
+        node->edge1.setName( tmpEdgeNameLabel_ );
     }
 }
 
@@ -386,7 +386,7 @@ void GraphBuilder::which_sample_is_below(){
 }
 
 /*! \brief rewrite node content of nodes */
-void GraphBuilder::rewrite_node_content(){
+void GraphBuilder::rewrite_subTreeStr(){
     size_t highest_i = 0;
     for ( auto it = nodes_.iterator(); it.good(); ++it){
         if ( (*it)->num_descndnt > this->nodes_.at(highest_i)->num_descndnt ){ highest_i = it.node_index();}
@@ -398,40 +398,39 @@ void GraphBuilder::rewrite_node_content(){
         for ( auto it = nodes_.iterator(); it.good(); ++it){
             if ( (*it)->rank() != rank_i ) continue;
 
-            (*it)->node_content = ( (*it)->rank() == 1 ) ? (*it)->label :
-                                                           this->rewrite_internal_node_content( (*it) );
+            (*it)->subTreeStr = ( (*it)->rank() == 1 ) ? (*it)->nodeName :
+                                                           this->rewrite_internal_subTreeStr( (*it) );
         }
     }
 }
 
 
-string GraphBuilder::rewrite_internal_node_content( Node * node ){
-    string new_node_content="(";
+string GraphBuilder::rewrite_internal_subTreeStr( Node * node ){
+    string new_subTreeStr="(";
     for (size_t child_i = 0; child_i < node->child.size(); child_i++ ){
-        string brchlen_str1 = to_string ( node->child[child_i]->brchlen1() );
-        if ( node->child[child_i]->node_content == node->child[child_i]->label ) {
-            //new_node_content += this->nodes_[i].child[child_i]->label+":" + to_string ( this->nodes_[i].child[child_i]->brchlen1() ) ;
-            new_node_content += node->child[child_i]->label+":" +  brchlen_str1;
+        string brchlen_str1 = to_string ( node->child[child_i]->edge1.bl() );
+        if ( node->child[child_i]->subTreeStr == node->child[child_i]->nodeName ) {
+            new_subTreeStr += node->child[child_i]->nodeName+":" +  brchlen_str1;
         }
         else {            
             bool new_hybrid_node=false;
             string brchlen_str2;
             for ( auto it = nodes_.iterator(); it.good(); ++it){
                 for ( size_t child_ii = 0; child_ii < (*it)->child.size(); child_ii++ ){
-                    if ( (*it)->child[child_ii]->node_content == node->child[child_i]->node_content){
+                    if ( (*it)->child[child_ii]->subTreeStr == node->child[child_i]->subTreeStr){
                         new_hybrid_node=true;
-                        brchlen_str2 = to_string(node->child[child_i]->brchlen2() );
+                        brchlen_str2 = to_string(node->child[child_i]->edge2.bl() );
                     break;}
                 }
                 if (new_hybrid_node){break;}
             }
-            new_node_content += new_hybrid_node ? node->child[child_i]->label+":" + brchlen_str2 : 
-                                                  node->child[child_i]->node_content + node->child[child_i]->label+":" +  brchlen_str1;
+            new_subTreeStr += new_hybrid_node ? node->child[child_i]->nodeName+":" + brchlen_str2 : 
+                                                  node->child[child_i]->subTreeStr + node->child[child_i]->nodeName+":" +  brchlen_str1;
         }
-        if ( child_i < node->child.size() - 1 ) new_node_content += ",";
+        if ( child_i < node->child.size() - 1 ) new_subTreeStr += ",";
     }
-    new_node_content += ")";
-    return new_node_content;
+    new_subTreeStr += ")";
+    return new_subTreeStr;
 }
 
 
@@ -450,8 +449,8 @@ void GraphBuilder::check_isUltrametric(){
             else{
                 for (size_t child_i = 0; child_i < current_node->child.size(); child_i++ ){
                     double current_child_time = (current_node->child[child_i]->parent1() == current_node) ?
-                                                current_node->child[child_i]->brchlen1():
-                                                current_node->child[child_i]->brchlen2();
+                                                current_node->child[child_i]->edge1.bl():
+                                                current_node->child[child_i]->edge2.bl();
                     for ( size_t i = 0;i < current_node->child[child_i]->path_time.size(); i++){
                         current_node->path_time.push_back( current_child_time + current_node->child[child_i]->path_time[i] );
                     }
@@ -476,18 +475,18 @@ void GraphBuilder::check_isUltrametric(){
                 break;
             }
         }
-        (*it)->set_height( (*it)->path_time[0] );
+        //(*it)->set_height( (*it)->path_time[0] );
     }
 }
 
 
 string GraphBuilder::print_newick( Node * node ){
     string tree_str;
-    if ( node->is_tip() ) tree_str = node->label ;
+    if ( node->is_tip() ) tree_str = node->nodeName ;
     else {
         tree_str = "(";
         for ( size_t i = 0 ; i < node->child.size() ; i++ ){
-            tree_str += print_newick ( node->child[i] ) + ":" + to_string (node->child[i]->brchlen1() );
+            tree_str += print_newick ( node->child[i] ) + ":" + to_string (node->child[i]->edge1.bl() );
             if ( i < node->child.size()-1 ) tree_str += ",";
         }
         tree_str += ")";

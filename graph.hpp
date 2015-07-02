@@ -29,17 +29,17 @@
 /*! \brief Network class*/
 
 class GraphReader{
-    friend class GraphBuilder;
-    friend class TestGraphReader;
+  friend class GraphBuilder;
+  friend class TestGraphReader;
     // Members
     string net_str;
     vector < string > node_labels;
-    vector < string > node_contents;
+    vector < string > subTreeStrs;
     vector < string > brchlens;
-    
+  
     vector <string> tip_name; 
     vector <string> tax_name;
-    
+  
     // Methods
     GraphReader( string net_str );
     ~GraphReader(){ }
@@ -49,7 +49,7 @@ class GraphReader{
     void extract_tax_and_tip_names();
     size_t Parenthesis_balance_index_backwards( string &in_str, size_t i );
     string label_interior_node(string in_str);
-    string extract_One_node_content( string &in_str, size_t back_parenthesis_index );
+    string extract_One_subTreeStr( string &in_str, size_t back_parenthesis_index );
     string extract_label(string &in_str, size_t i);
 };
 
@@ -109,52 +109,52 @@ bool start_of_tax_name(string in_str, size_t i);
 
 
 class GraphBuilder{
-    friend class Net;
-    friend class CoalST;
-    friend class CoalGT;
-    friend class HybridCoal;
-    friend class Frequency;
-    friend class Figure;
-    private:
-        // Members 
-        bool is_ultrametric; /*!< \brief true if the distances between tips and root are equal; false, otherwise */ // This is used in Figure
-        bool is_Net; /*!< \brief true if Net is a network; false if it's a tree */        
-        NodeContainer nodes_;
-        GraphReader * Tree_info;
-        size_t current_enum_;
-        vector <string> tip_name; // maybe don't need them actually...
-        vector <string> tax_name; // maybe don't need them actually...
-        //string net_str; /*!< \brief species network string \todo this is new!!!*/
-        size_t max_rank;
+  friend class Net;
+  friend class CoalST;
+  friend class CoalGT;
+  friend class HybridCoal;
+  friend class Frequency;
+  friend class Figure;
+  private:
+    // Members 
+    bool is_ultrametric; /*!< \brief true if the distances between tips and root are equal; false, otherwise */ // This is used in Figure
+    bool is_Net; /*!< \brief true if Net is a network; false if it's a tree */    
+    NodeContainer nodes_;
+    GraphReader * Tree_info;
+    size_t tmpEdgeNameLabel_;
+    vector <string> tip_name; // maybe don't need them actually...
+    vector <string> tax_name; // maybe don't need them actually...
+    //string net_str; /*!< \brief species network string \todo this is new!!!*/
+    size_t max_rank;
 
-        // Methods
-        void init();
-        void enumerate_internal_branch( Node *node );
-        void init_descendant(){}; // maybe don't need them actually...
-        void init_node_clade(){}; // maybe don't need them actually...
-        void rewrite_descendant();
-        string rewrite_internal_node_content( Node * node );
-        void rewrite_node_clade(); // maybe don't need them actually...
-        size_t Parenthesis_balance_index_forwards( string &in_str, size_t i );
-        void check_isNet(); /*!< \brief To determin if a Net is network or not. \return is_Net */
-        void check_isUltrametric(); /*!< \brief To determin if a Net is ultrametric or not. \return is_ultrametric */
-            
-        void which_taxa_is_below();
-        void which_sample_is_below();
-        bool is_Net_() const { return this->is_Net ; }
-        void print();
-        bool print_all_node_dout();
-        void initialize_nodes( string &net_str );
-        void remove_repeated_hybrid_node();
-        void connect_graph();
+    // Methods
+    void init();
+    void enumerate_internal_branch( Node *node );
+    void init_descendant(){}; // maybe don't need them actually...
+    void init_node_clade(){}; // maybe don't need them actually...
+    void rewrite_descendant();
+    string rewrite_internal_subTreeStr( Node * node );
+    void rewrite_node_clade(); // maybe don't need them actually...
+    size_t Parenthesis_balance_index_forwards( string &in_str, size_t i );
+    void check_isNet(); /*!< \brief To determin if a Net is network or not. \return is_Net */
+    void check_isUltrametric(); /*!< \brief To determin if a Net is ultrametric or not. \return is_ultrametric */
+      
+    void which_taxa_is_below();
+    void which_sample_is_below();
+    bool is_Net_() const { return this->is_Net ; }
+    void print();
+    bool print_all_node_dout();
+    void initialize_nodes( string &net_str );
+    void remove_repeated_hybrid_node();
+    void connect_graph();
+  
+    GraphBuilder( string &net_str );
+    ~GraphBuilder(){};
     
-        GraphBuilder( string &net_str );
-        ~GraphBuilder(){};
-        
-    public:
-        NodeContainer *nodes() { return &(this->nodes_); } /*!< \brief array of nodes */
-        void rewrite_node_content();
-        string print_newick( Node * node );
+  public:
+    NodeContainer *nodes() { return &(this->nodes_); } /*!< \brief array of nodes */
+    void rewrite_subTreeStr();
+    string print_newick( Node * node );
 };
 
 

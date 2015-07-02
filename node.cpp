@@ -24,14 +24,14 @@
 
 Node::Node ( size_t max_of_taxa,
              size_t max_of_sample, // number of tip
-             string label,
-             string content,
+             string nodeName,
+             string treeStr,
              double bl,
              bool tip ){
     this->init();
-    this->label = label;
-    this->node_content = content;
-    this->brchlen1_ = bl;
+    this->nodeName = nodeName;
+    this->subTreeStr = treeStr;
+    this->edge1.setLength(bl);
     this->is_tip_ = tip;
     // clade=" ";
     
@@ -44,66 +44,38 @@ void Node::init(){
     this->parent2_ = NULL;
     this->previous_ = NULL;
     this->next_     = NULL;
-    this->brchlen2_ = 0.0;
     this->rank_     = 0;
-    this->edge_    = 0;
-    this->edge2_   = 0;
-    this->height_ = 1.0/0.0;
+    //this->height_ = 1.0/0.0;
     // prob_to_hybrid_left=1.0;
     this->visited_ = false;
     this->is_below_hybrid_ = false;
-    num_descndnt=0;
-    num_descndnt_interior=0;
+    this->num_descndnt=0;
+    this->num_descndnt_interior=0;
 }
 
 
-//Node::Node(){
-	//label="";
-	//node_content="";
-	////num_child=0;
-	//num_descndnt=0;
-	//num_descndnt_interior=0;
-	//this->parent1_ = NULL;
-	//this->parent2_ = NULL;
-    //this->previous_ = NULL;
-    //this->next_     = NULL;
-	//this->brchlen1_ = 0.0;
-	//this->brchlen2_ = 0.0;
-	//this->rank_     = 0;
-	//this->edge_    = 0;
-	//this->edge2_   = 0;
-	////visit=0;
-	//descndnt_of_hybrid=false;
-	//this->is_tip()=false;
-	////clade=" ";
-	//this->height_ = 1.0/0.0;
-	////prob_to_hybrid_left=1.0;
-	//this->visited_ = false;
-//}
-
-
 void Node::print( bool is_Net ){
-    cout << setw(7) << this->label;
+    cout << setw(7) << this->nodeName;
     cout << setw(12) << (this);
     if ( is_Net ) cout << setw(6) << this->hybrid();
     if ( is_Net ) cout << setw(8) << this->is_below_hybrid();
     cout << setw(5) << this->is_tip();
-    if ( this->parent1() != NULL ) cout << setw (11) << ( this->parent1() );//if (this->parent1) cout << setw (11) << (parent1->label);
+    if ( this->parent1() != NULL ) cout << setw (11) << ( this->parent1() );
     else cout << "           ";
-	cout << setw (12) << this->height();
-	cout << setw (12) << this->brchlen1();
-    if (is_Net){
-        if ( this->parent2() != NULL) cout << setw (11) << ( this->parent2() ); //if (this->parent2) cout << setw (11) << (parent2->label);
-        else cout << "           ";
-        cout<<setw (12) << this->brchlen2();
-    }
+	//cout << setw (12) << this->height();
+	//cout << setw (12) << this->brchlen1();
+    //if (is_Net){
+        //if ( this->parent2() != NULL) cout << setw (11) << ( this->parent2() ); 
+        //else cout << "           ";
+        //cout<<setw (12) << this->brchlen2();
+    //}
 	cout << setw (7) << this->child.size();
 	cout << setw (8) << num_descndnt;
 	cout << setw(4) << num_descndnt_interior;
 	cout << setw(6) << this->rank() << "   ";
 	
-	cout << setw(2)<<this->edge();
-	if ( is_Net ) cout << setw(3) << this->edge2();
+	//cout << setw(2)<<this->edge();
+	//if ( is_Net ) cout << setw(3) << this->edge2();
 	cout << "    " << this->clade;
     for ( size_t i = 0; i < this->samples_below.size(); i++ ){
 		cout<<this->samples_below[i];
@@ -130,7 +102,10 @@ void Node::add_child( Node *child_node /*! pointer to the child node*/){
  * Child node has lower rank than the parent node. Tip nodes have rank one, the root node has the highest rank
  */
 void Node::CalculateRank(){
-    if ( this->is_tip() ) this->rank_ = 1;
+    if ( this->is_tip() ) {
+        this->rank_ = 1;
+        return;
+    }
     else {
         size_t child_max_rank = 0;
         for ( size_t ith_child = 0; ith_child < this->child.size(); ith_child++ ){
@@ -138,6 +113,7 @@ void Node::CalculateRank(){
             child_max_rank = max( child_max_rank, this->child[ith_child]->rank() );
         }
         this->rank_ = child_max_rank + 1;
+        return;
     }
 }
 
@@ -162,17 +138,15 @@ bool Node::print_dout( bool is_Net ){
     if ( is_Net ) dout << setw(6) << this->hybrid();
     if ( is_Net ) dout << setw(8) << this->is_below_hybrid();
         dout << setw(5) << this->is_tip();
-    //if (this->parent1) dout << setw (11) << (parent1->label);
-    //else dout << "           ";
     if ( this->parent1() != NULL ) dout << setw (11) << ( this->parent1() ); //if (this->parent1) dout << setw (11) << (this->parent1_());
     else dout << "           ";
-        dout << setw (6) << this->height();
-        dout << setw (12) << this->brchlen1();
-    if (is_Net){
-        if ( this->parent2() != NULL ) dout << setw (11) << ( this->parent2()->label );
-        else dout << "           ";
-        dout<<setw (12) << this->brchlen2();
-    }
+    //dout << setw (6) << this->height();
+    //dout << setw (12) << this->brchlen1();
+    //if (is_Net){
+        //if ( this->parent2() != NULL ) dout << setw (11) << ( this->parent2()->nodeName );
+        //else dout << "           ";
+        //dout<<setw (12) << this->brchlen2();
+    //}
     dout << setw (7) << this->child.size();
     dout << setw (8) << num_descndnt;
     dout << setw(4) << num_descndnt_interior;
@@ -180,8 +154,8 @@ bool Node::print_dout( bool is_Net ){
     //for (size_t i=0;i<descndnt.size();i++){
         //dout<<setw (1)<<descndnt[i];
     //}
-    dout << setw(2)<<this->edge();
-    if ( is_Net ) dout << setw(3) << this->edge2();
+    //dout << setw(2)<<this->edge();
+    //if ( is_Net ) dout << setw(3) << this->edge2();
     dout << "    " << this->clade;
     //dout<<endl;
     return true;

@@ -111,7 +111,7 @@ class NodeIterator {
         
     bool good() const { return ( this->current_node_ != NULL ); }
     
-    double height() const { return ( this->good() ? this->current_node_->height() : DBL_MAX ); }
+    //double height() const { return ( this->good() ? this->current_node_->height() : DBL_MAX ); }
 };
 
 inline NodeIterator NodeContainer::iterator() { return NodeIterator(*this); }
