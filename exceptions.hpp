@@ -1,6 +1,6 @@
-/* 
+/*
  * hybrid-coal is used to compute gene tree probabilities given species network under coalescent process.
- * 
+ *
  * Copyright (C) 2010 -- 2015 Sha (Joe) Zhu
  *
  * This file is part of hybrid-coal

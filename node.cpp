@@ -1,6 +1,6 @@
-/* 
+/*
  * hybrid-coal is used to compute gene tree probabilities given species network under coalescent process.
- * 
+ *
  * Copyright (C) 2010 -- 2015 Sha (Joe) Zhu
  *
  * This file is part of hybrid-coal
@@ -34,7 +34,7 @@ Node::Node ( size_t max_of_taxa,
     this->edge1.setLength(bl);
     this->is_tip_ = tip;
     // clade=" ";
-    
+
     this->taxa_below = valarray < size_t > ( (size_t)0, max_of_taxa );
     this->samples_below = valarray < size_t > ( (size_t)0, max_of_sample );
 }
@@ -62,29 +62,29 @@ void Node::print( bool is_Net ){
     cout << setw(5) << this->is_tip();
     if ( this->parent1() != NULL ) cout << setw (11) << ( this->parent1() );
     else cout << "           ";
-	//cout << setw (12) << this->height();
-	//cout << setw (12) << this->brchlen1();
+    //cout << setw (12) << this->height();
+    //cout << setw (12) << this->brchlen1();
     //if (is_Net){
-        //if ( this->parent2() != NULL) cout << setw (11) << ( this->parent2() ); 
+        //if ( this->parent2() != NULL) cout << setw (11) << ( this->parent2() );
         //else cout << "           ";
         //cout<<setw (12) << this->brchlen2();
     //}
-	cout << setw (7) << this->child.size();
-	cout << setw (8) << num_descndnt;
-	cout << setw(4) << num_descndnt_interior;
-	cout << setw(6) << this->rank() << "   ";
-	
-	//cout << setw(2)<<this->edge();
-	//if ( is_Net ) cout << setw(3) << this->edge2();
-	cout << "    " << this->clade;
+    cout << setw (7) << this->child.size();
+    cout << setw (8) << num_descndnt;
+    cout << setw(4) << num_descndnt_interior;
+    cout << setw(6) << this->rank() << "   ";
+
+    //cout << setw(2)<<this->edge();
+    //if ( is_Net ) cout << setw(3) << this->edge2();
+    cout << "    " << this->clade;
     for ( size_t i = 0; i < this->samples_below.size(); i++ ){
-		cout<<this->samples_below[i];
-	}
+        cout<<this->samples_below[i];
+    }
     cout <<" ";
     for ( size_t i = 0; i < this->taxa_below.size(); i++ ){
-		cout<<this->taxa_below[i];
-	}
-	//cout<<endl;
+        cout<<this->taxa_below[i];
+    }
+    //cout<<endl;
 }
 
 /*! \brief Add child node to parent node */
@@ -94,11 +94,11 @@ void Node::add_child( Node *child_node /*! pointer to the child node*/){
         child_node->set_parent2 ( this );
     }
     else child_node->set_parent1 ( this );
-} 
+}
 
 
 /*! \brief Rank network node from the bottom.
- * 
+ *
  * Child node has lower rank than the parent node. Tip nodes have rank one, the root node has the highest rank
  */
 void Node::CalculateRank(){
@@ -109,7 +109,7 @@ void Node::CalculateRank(){
     else {
         size_t child_max_rank = 0;
         for ( size_t ith_child = 0; ith_child < this->child.size(); ith_child++ ){
-            this->child[ith_child]->CalculateRank();			
+            this->child[ith_child]->CalculateRank();
             child_max_rank = max( child_max_rank, this->child[ith_child]->rank() );
         }
         this->rank_ = child_max_rank + 1;
@@ -122,7 +122,7 @@ void Node::CalculateRank(){
 
 ///*! \brief Label a node if its a descendant of a hybrid node */
 //void Node::find_hybrid_descndnt(){
-	//if ( this->is_tip() ) return;
+    //if ( this->is_tip() ) return;
     //for ( size_t ith_child = 0; ith_child < this->child.size(); ith_child++){
         //if ( this->hybrid() || this->descndnt_of_hybrid ) this->child[ith_child]->descndnt_of_hybrid = true;
         //this->child[ith_child]->find_hybrid_descndnt();

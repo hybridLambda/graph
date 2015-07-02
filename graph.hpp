@@ -1,6 +1,6 @@
-/* 
+/*
  * hybrid-coal is used to compute gene tree probabilities given species network under coalescent process.
- * 
+ *
  * Copyright (C) 2010 -- 2015 Sha (Joe) Zhu
  *
  * This file is part of hybrid-coal
@@ -37,10 +37,10 @@ class GraphReader{
     vector < string > node_labels;
     vector < string > subTreeStrs;
     vector < string > brchlens;
-  
-    vector <string> tip_name; 
+
+    vector <string> tip_name;
     vector <string> tax_name;
-  
+
     // Methods
     GraphReader( string net_str );
     ~GraphReader(){ }
@@ -66,9 +66,9 @@ class GraphBuilder{
   friend class Frequency;
   friend class Figure;
   private:
-    // Members 
+    // Members
     bool is_ultrametric; /*!< \brief true if the distances between tips and root are equal; false, otherwise */ // This is used in Figure
-    bool is_Net; /*!< \brief true if Net is a network; false if it's a tree */    
+    bool is_Net; /*!< \brief true if Net is a network; false if it's a tree */
     NodeContainer nodes_;
     GraphReader * Tree_info;
     size_t tmpEdgeNameLabel_;
@@ -88,7 +88,7 @@ class GraphBuilder{
     size_t Parenthesis_balance_index_forwards( string &in_str, size_t i );
     void check_isNet(); /*!< \brief To determin if a Net is network or not. \return is_Net */
     void check_isUltrametric(); /*!< \brief To determin if a Net is ultrametric or not. \return is_ultrametric */
-      
+
     void which_taxa_is_below();
     void which_sample_is_below();
     bool is_Net_() const { return this->is_Net ; }
@@ -97,10 +97,10 @@ class GraphBuilder{
     void initialize_nodes( string &net_str );
     void remove_repeated_hybrid_node();
     void connect_graph();
-  
+
     GraphBuilder( string &net_str );
     ~GraphBuilder(){};
-    
+
   public:
     NodeContainer *nodes() { return &(this->nodes_); } /*!< \brief array of nodes */
     void rewrite_subTreeStr();

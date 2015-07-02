@@ -1,6 +1,6 @@
-/* 
+/*
  * hybrid-coal is used to compute gene tree probabilities given species network under coalescent process.
- * 
+ *
  * Copyright (C) 2010 -- 2015 Sha (Joe) Zhu
  *
  * This file is part of hybrid-coal
@@ -42,21 +42,21 @@ class NodeContainer {
     //public:
     NodeContainer();
     ~NodeContainer() { this->clear(); };
-    
+
     NodeContainer& operator=( NodeContainer nc ) {
-        swap(*this, nc);  
+        swap(*this, nc);
         return(*this);
     };
-    
+
     NodeContainer( NodeContainer &nc );
-    
-    NodeIterator iterator(); 
+
+    NodeIterator iterator();
     NodeIterator iterator( Node* node );
-    
+
     //private:
     friend void swap( NodeContainer& a, NodeContainer& b );
-    
-    size_t size_;    
+
+    size_t size_;
     Node* first_node_;
     Node* last_node_;
 
@@ -64,19 +64,19 @@ class NodeContainer {
     void remove( Node *node );
     //void move( Node *node, const double new_height );
     void clear();
-    
-    Node* at(size_t nr) const; 
-    Node const* get(size_t nr) const { return at(nr); }; 
-    
+
+    Node* at(size_t nr) const;
+    Node const* get(size_t nr) const { return at(nr); };
+
     Node* first() const { return first_node_; };
     Node* back() const { return last_node_; };
-    
-    size_t size() const { return size_; };  
-    
+
+    size_t size() const { return size_; };
+
     void set_first( Node* node) { this->first_node_ = node; }
     void set_last ( Node* node) { this->last_node_  = node; }
     void add_before(Node* add, Node* before); // Use this when adding new nodes.
-    
+
 };
 
 class NodeIterator {
@@ -89,28 +89,28 @@ class NodeIterator {
     NodeIterator( NodeContainer& nc) { this->current_node_ = nc.first(); };
     NodeIterator( Node* node) { this->current_node_ = node; };
     ~NodeIterator() {};
-        
+
     Node* operator*() {
       if ( this->current_node_ == NULL ) throw std::out_of_range( "Node iterator out of range" );
-      return this->current_node_; 
+      return this->current_node_;
     }
-    
+
     Node* operator++() {
       if ( this->current_node_ == NULL ) throw std::out_of_range( "Node iterator out of range" );
       this->current_node_ = ( this->current_node_->is_last() ) ? NULL : this->current_node_->next();
       node_index_++;
       return this->current_node_;
     }
-    
+
     Node* operator--() {
       if ( this->current_node_ == NULL ) throw std::out_of_range( "Node iterator out of range" );
       this->current_node_ = ( this->current_node_->is_first() ) ? NULL : this->current_node_->previous();
       node_index_--;
       return this->current_node_;
     }
-        
+
     bool good() const { return ( this->current_node_ != NULL ); }
-    
+
     //double height() const { return ( this->good() ? this->current_node_->height() : DBL_MAX ); }
 };
 

@@ -1,6 +1,6 @@
-/* 
+/*
  * hybrid-coal is used to compute gene tree probabilities given species network under coalescent process.
- * 
+ *
  * Copyright (C) 2010 -- 2015 Sha (Joe) Zhu
  *
  * This file is part of hybrid-coal
@@ -35,18 +35,18 @@ NodeContainer::NodeContainer( NodeContainer &nc) {
     this->size_ = 0;
     this->last_node_ = NULL;
     this->first_node_ = NULL;
-    
-    std::map<Node const*, Node*> node_mapping;  
+
+    std::map<Node const*, Node*> node_mapping;
     node_mapping[NULL] = NULL;
-    
+
     for ( auto it = nc.iterator(); it.good(); ++it ) {
         Node *node = new Node(**it);
         node_mapping[*it] = node;
         node->child.clear(); // clear child nodes
         this->add(node);
     }
-    
-    for ( auto it = iterator(); it.good(); ++it ) {       
+
+    for ( auto it = iterator(); it.good(); ++it ) {
         if ( (*it)->parent1() != NULL ) {
             (*it)->set_parent1 ( node_mapping[(*it)->parent1()] );
             (*it)->parent1()->child.push_back( (*it) );
@@ -69,7 +69,7 @@ Node* NodeContainer::at(size_t nr) const {
         current = current->next();
     }
 
-    if ( current == NULL ) throw std::out_of_range("NodeContainer out of range"); 
+    if ( current == NULL ) throw std::out_of_range("NodeContainer out of range");
     return current;
 }
 
@@ -103,7 +103,7 @@ void NodeContainer::add( Node* node ) {
 
 
 void NodeContainer::remove( Node *node ) {
-    --size_; 
+    --size_;
     if ( node->is_first() && node->is_last() ) {
         this->set_first(NULL);
         this->set_last(NULL);
@@ -171,7 +171,7 @@ void NodeContainer::clear() {
 void NodeContainer::add_before(Node* add, Node* before){
     add->set_next(before);
     add->set_previous(before->previous());
-    
+
     if ( add->previous() != NULL ) add->previous()->set_next(add);
     before->set_previous(add);
     if ( add->is_last() ) this->set_last(add);

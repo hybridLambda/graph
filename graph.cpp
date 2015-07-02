@@ -1,6 +1,6 @@
-/* 
+/*
  * hybrid-coal is used to compute gene tree probabilities given species network under coalescent process.
- * 
+ *
  * Copyright (C) 2010 -- 2015 Sha (Joe) Zhu
  *
  * This file is part of hybrid-coal
@@ -23,7 +23,7 @@
 #include "graph.hpp"
 
 GraphReader::GraphReader ( string in_str ){
-    // check & sign, this should be illigal for hybrid-Lambda, 
+    // check & sign, this should be illigal for hybrid-Lambda,
     this->check_Parenthesis( in_str );
     this->check_labeled( in_str );
 
@@ -37,7 +37,7 @@ GraphReader::GraphReader ( string in_str ){
             size_t str_start_index = charPosition;
             string label = extract_label( this->net_str, charPosition );
             this->node_labels.push_back(label);
-            
+
             string subTreeStr = ( this->net_str[str_start_index-1]==')' ) ? extract_One_subTreeStr ( this->net_str, str_start_index-1 )
                                                                             : label ;
             subTreeStrs.push_back(subTreeStr);
@@ -95,7 +95,7 @@ void GraphReader::check_labeled( string in_str ){
             labeled_bool = false;
             break;
         }
-    }    
+    }
     this->net_str = labeled_bool ? in_str:label_interior_node(in_str);
 }
 
@@ -104,7 +104,7 @@ void GraphReader::check_labeled( string in_str ){
 string GraphReader::label_interior_node(string in_str /*!< input newick form string */){
     vector <string> in_str_partition;
     int interior_node_counter = 0;
-    int sub_str_start_index = 0;            
+    int sub_str_start_index = 0;
     size_t i = in_str.find(')');
     while ( i<in_str.size() ){
         interior_node_counter++;
@@ -123,7 +123,7 @@ string GraphReader::label_interior_node(string in_str /*!< input newick form str
         i = in_str.find( ")", i+1 );
     }
     string out_str;
-    for ( size_t i = 0; i < in_str_partition.size(); i++ ) 
+    for ( size_t i = 0; i < in_str_partition.size(); i++ )
         out_str += in_str_partition[i];
     return out_str;
 }
@@ -155,18 +155,18 @@ void GraphReader::extract_tax_and_tip_names(){
 
 /*! \brief Construct Net object from a (extended) Newick string */
 GraphBuilder::GraphBuilder(string &in_str /*! input (extended) newick form string */){
-    if ( in_str.size() == 0 ) 
+    if ( in_str.size() == 0 )
         return;
-    
+
     this->init( );
-    
+
     this->initialize_nodes( in_str );
     this->remove_repeated_hybrid_node();
     this->connect_graph();
 
     //this->nodes_.back()->find_hybrid_descndnt();
     this->nodes_.back()->CalculateRank();
-    this->max_rank = nodes_.back()->rank();    
+    this->max_rank = nodes_.back()->rank();
     this->enumerate_internal_branch( this->nodes_.back() );
     //this->init_descendant();
     //this->init_node_clade();
@@ -222,14 +222,14 @@ void GraphBuilder::remove_repeated_hybrid_node(){
         NodeIterator it_j ( (*it_i)->next() );
         for ( ; it_j.good(); ++it_j){
             if ( (*it_j)->next() == NULL ) break;
-            if ( (*it_i)->nodeName != (*it_j)->nodeName ) continue;            
+            if ( (*it_i)->nodeName != (*it_j)->nodeName ) continue;
             dout << "Remove " << (*it_j)->nodeName <<" "<< (*it_j)->subTreeStr <<endl;
-            if ( (*it_j)->subTreeStr[0] == '(' ){                
+            if ( (*it_j)->subTreeStr[0] == '(' ){
                 (*it_i)->subTreeStr = (*it_j)->subTreeStr;
             }
             (*it_i)->edge2.setLength ( (*it_j)->edge1.bl() );
             break;
-        }        
+        }
         if ( (*it_j)->nodeName == (*it_i)->nodeName ) this->nodes_.remove( (*it_j) );
     }
 }
@@ -241,10 +241,10 @@ void GraphBuilder::connect_graph(){
     for ( auto it = nodes_.iterator(); it.good(); ++it){
         dout << " node " << (*it) << ": " << (*it)->nodeName <<"\t"<<(*it)->subTreeStr<<endl;
         if ( (*it)->subTreeStr[0] != '(' ) continue;
-        
+
         char child_node1[(*it)->subTreeStr.length()];
         for ( size_t i_content_len = 1; i_content_len < (*it)->subTreeStr.length(); ){
-            if ((*it)->subTreeStr[i_content_len]=='(' ||  start_of_tax_name((*it)->subTreeStr,i_content_len) ){    
+            if ((*it)->subTreeStr[i_content_len]=='(' ||  start_of_tax_name((*it)->subTreeStr,i_content_len) ){
                 size_t j_content_len = ((*it)->subTreeStr[i_content_len] == '(') ? Parenthesis_balance_index_forwards( (*it)->subTreeStr, i_content_len ) + 1:
                                                                                      i_content_len;
                 int child1_subTreeStr_i = 0;
@@ -257,7 +257,7 @@ void GraphBuilder::connect_graph(){
                     }
                     child1_subTreeStr_i++;
                 }
-                string child_node1_str = child_node1;        
+                string child_node1_str = child_node1;
                 i_content_len = j_content_len + 2;
                 for ( auto it_i = nodes_.iterator(); it_i.good(); ++it_i){
                         if (child_node1_str == (*it_i)->nodeName) {
@@ -273,8 +273,8 @@ void GraphBuilder::connect_graph(){
                 //}
             }
             else { i_content_len++;}
-        }    
-    }    
+        }
+    }
 }
 
 
@@ -297,7 +297,7 @@ void GraphBuilder::print(){
     for ( auto it = nodes_.iterator(); it.good(); ++it){
         //for (size_t j = 0; j < this->descndnt[i].size(); j++ ) {cout<<setw(3)<<this->descndnt[i][j];}
         (*it)->print( this->is_Net_() );
-        cout<<"  ";        
+        cout<<"  ";
         //for (size_t j=0;j<this->samples_below[i].size();j++) {cout<<this->samples_below[i][j]; }
         cout<<endl;
     }
@@ -341,7 +341,7 @@ size_t GraphBuilder::Parenthesis_balance_index_forwards( string &in_str, size_t 
     size_t j = i;
     int num_b = 0;
     for ( ; j < in_str.size(); j++ ){
-        if      ( in_str[j] == '(' ) num_b++;        
+        if      ( in_str[j] == '(' ) num_b++;
         else if ( in_str[j] == ')' ) num_b--;
         else continue;
         if ( num_b == 0 ) break;
@@ -354,12 +354,12 @@ void GraphBuilder::which_taxa_is_below(){
     for ( auto it = nodes_.iterator(); it.good(); ++it){
         Node* current_node = (*it);
         if ( !current_node->is_tip() ) continue;
-        
+
         size_t taxa_i = 0;
         for ( taxa_i = 0 ; taxa_i < current_node->taxa_below.size(); taxa_i++){
             if ( current_node->taxa_below[taxa_i] == 1 ) break;
-        }        
-        
+        }
+
         while ( current_node->parent1() ){
             current_node->parent1()->taxa_below[taxa_i] = 1;
             current_node =  current_node->parent1() ;
@@ -372,12 +372,12 @@ void GraphBuilder::which_sample_is_below(){
     for ( auto it = nodes_.iterator(); it.good(); ++it){
         Node* current_node = (*it);
         if ( !current_node->is_tip() ) continue;
-        
+
         size_t taxa_i = 0;
         for ( taxa_i = 0 ; taxa_i < current_node->samples_below.size(); taxa_i++){
             if ( current_node->samples_below[taxa_i] == 1 ) break;
-        }        
-        
+        }
+
         while ( current_node->parent1() ){
             current_node->parent1()->samples_below[taxa_i] = 1;
             current_node =  current_node->parent1() ;
@@ -391,7 +391,7 @@ void GraphBuilder::rewrite_subTreeStr(){
     for ( auto it = nodes_.iterator(); it.good(); ++it){
         if ( (*it)->num_descndnt > this->nodes_.at(highest_i)->num_descndnt ){ highest_i = it.node_index();}
     }
-    
+
     this->nodes_.at(highest_i)->CalculateRank();
 
     for ( size_t rank_i = 1; rank_i <= this->nodes_.back()->rank(); rank_i++){
@@ -412,7 +412,7 @@ string GraphBuilder::rewrite_internal_subTreeStr( Node * node ){
         if ( node->child[child_i]->subTreeStr == node->child[child_i]->nodeName ) {
             new_subTreeStr += node->child[child_i]->nodeName+":" +  brchlen_str1;
         }
-        else {            
+        else {
             bool new_hybrid_node=false;
             string brchlen_str2;
             for ( auto it = nodes_.iterator(); it.good(); ++it){
@@ -424,7 +424,7 @@ string GraphBuilder::rewrite_internal_subTreeStr( Node * node ){
                 }
                 if (new_hybrid_node){break;}
             }
-            new_subTreeStr += new_hybrid_node ? node->child[child_i]->nodeName+":" + brchlen_str2 : 
+            new_subTreeStr += new_hybrid_node ? node->child[child_i]->nodeName+":" + brchlen_str2 :
                                                   node->child[child_i]->subTreeStr + node->child[child_i]->nodeName+":" +  brchlen_str1;
         }
         if ( child_i < node->child.size() - 1 ) new_subTreeStr += ",";
@@ -440,7 +440,7 @@ void GraphBuilder::check_isUltrametric(){
         remaining_node.push_back( (*it) );
     }
     size_t rank_i = 1;
-    size_t remaining_node_i=0;    
+    size_t remaining_node_i=0;
     while ( remaining_node.size() > 0 ){
         //int node_i = remaining_node[remaining_node_i];
         Node * current_node = remaining_node[remaining_node_i];
@@ -455,7 +455,7 @@ void GraphBuilder::check_isUltrametric(){
                         current_node->path_time.push_back( current_child_time + current_node->child[child_i]->path_time[i] );
                     }
                 }
-            }            
+            }
             remaining_node.erase( remaining_node.begin() + remaining_node_i );
         }
         else{
@@ -499,11 +499,11 @@ string GraphBuilder::print_newick( Node * node ){
 bool start_of_tax_name( string in_str, size_t i ){
     //bool start_bool = false;
     //if ( (in_str[i]!='(' && in_str[i-1]=='(') || (in_str[i-1]==',' && in_str[i]!='(') || ( (in_str[i-1]==')') && ( in_str[i]!=')' || in_str[i]!=':' || in_str[i]!=',' || in_str[i]!=';' ) ) ) {
-        //start_bool=true;    
-    //}    
+        //start_bool=true;
+    //}
     //return     start_bool;
     if      (  in_str[i-1] == '('  &&   in_str[i] != '(' ) return true;
-    else if (  in_str[i-1] == ','  &&   in_str[i] != '(' ) return true; 
+    else if (  in_str[i-1] == ','  &&   in_str[i] != '(' ) return true;
     else if ( (in_str[i-1] == ')') && ( in_str[i] != ')' || in_str[i]!=':' || in_str[i]!=',' || in_str[i]!=';' ) ) return true;
     else return false;
 }
@@ -519,7 +519,7 @@ size_t end_of_label_or_bl( string &in_str, size_t i ){
     }
 }
 
-    
+
 void readNextStringto( string &readto, int& argc_i, int argc_, char * const* argv_ ){
     argc_i++;
     if (argc_i >= argc_) throw NotEnoughArg( argv_[argc_i-1] );
@@ -534,7 +534,7 @@ void readNextStringto( string &readto, int& argc_i, int argc_, char * const* arg
 string remove_interior_label(string in_str/*!< input newick form string */){
     string out_str;
     out_str=in_str;
-    
+
     size_t found_bracket=out_str.find(')');
     while ( found_bracket<out_str.size() ){
         if ( isalpha(out_str[found_bracket+1]) || isdigit(out_str[found_bracket+1]) ){
@@ -548,15 +548,15 @@ string remove_interior_label(string in_str/*!< input newick form string */){
 
 
 //string rm_one_child_root(string in_str){
-	//string out_str=tree_topo(in_str);
-	//size_t first_bck_parent_idx=Parenthesis_balance_index_forwards(out_str,0);
-	//size_t second_bck_parent_idx=Parenthesis_balance_index_forwards(out_str,1);
-	//if ( (first_bck_parent_idx-1)== second_bck_parent_idx){
-		//return in_str.substr(1,Parenthesis_balance_index_forwards(in_str,1))+in_str.substr(Parenthesis_balance_index_forwards(in_str,0)+1,in_str.size()-Parenthesis_balance_index_forwards(in_str,0)-1);
-	//}
-	//else{
-		//return in_str;
-	//}
+    //string out_str=tree_topo(in_str);
+    //size_t first_bck_parent_idx=Parenthesis_balance_index_forwards(out_str,0);
+    //size_t second_bck_parent_idx=Parenthesis_balance_index_forwards(out_str,1);
+    //if ( (first_bck_parent_idx-1)== second_bck_parent_idx){
+        //return in_str.substr(1,Parenthesis_balance_index_forwards(in_str,1))+in_str.substr(Parenthesis_balance_index_forwards(in_str,0)+1,in_str.size()-Parenthesis_balance_index_forwards(in_str,0)-1);
+    //}
+    //else{
+        //return in_str;
+    //}
 //}
 
 
@@ -577,7 +577,7 @@ void GraphBuilder::rewrite_descendant(){    //check for coaleased tips(& sign in
             break;
         }
     }
-        
+
     if ( !rewrite_descndnt ) return;
 
     //tax_name.clear();
@@ -590,7 +590,7 @@ void GraphBuilder::rewrite_descendant(){    //check for coaleased tips(& sign in
             //tax_name.push_back(nodes_.back()->clade.substr(tax_name_start,tax_name_length));
             //tax_name_start=new_i_str+1;
             //tax_name_length=0;
-        //}                
+        //}
         //if (new_i_str==nodes_.back()->clade.size()-1){
             //tax_name.push_back(nodes_.back()->clade.substr(tax_name_start,tax_name_length));
         //}
@@ -610,7 +610,7 @@ void GraphBuilder::rewrite_descendant(){    //check for coaleased tips(& sign in
                 //contained_tips.push_back((*it)->clade.substr(tax_name_start,tax_name_length));
                 //tax_name_start=new_i_str+1;
                 //tax_name_length=0;
-            //}                
+            //}
             //if (new_i_str== (*it)->clade.size()-1){
                 //contained_tips.push_back( (*it)->clade.substr(tax_name_start,tax_name_length));
             //}
@@ -622,9 +622,9 @@ void GraphBuilder::rewrite_descendant(){    //check for coaleased tips(& sign in
                     //re_initial_descndnt[tax_i]=1;
                 //}
             //}
-        //}    
+        //}
         //descndnt.push_back(re_initial_descndnt);
-    //}            
+    //}
     ////this->rewrite_node_clade();
     //this->init_node_clade();
 }
