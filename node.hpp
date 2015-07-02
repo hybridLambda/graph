@@ -50,6 +50,9 @@ enum NAMETYPE { TAXA, TIP };
 class Edge {
   friend class Node;
   friend class GraphBuilder;
+  friend class Figure;
+    // For any extenal edge (connected to a tip node), the edgeName is set as zero.
+    // edgeName is used to label the interior branchs of the tree
     size_t edgeName_;
     double branchLength_;
     // Consider to use member to indicate the probability as well ...
@@ -57,7 +60,7 @@ class Edge {
     double bl() const { return this->branchLength_;}
     void setLength ( double bl ){ this->branchLength_ = bl; }
     
-    size_t label() const {return this->edgeName_;}
+    size_t name() const {return this->edgeName_;}
     void setName( size_t name ) { this->edgeName_ = name; }
     
     void setBothNameAndLength( size_t name, double bl){
