@@ -292,8 +292,8 @@ void GraphBuilder::check_isNet(){ //false stands for tree, true stands for net_w
 
 
 void GraphBuilder::print(){
-    if ( this->is_Net ) cout<<"           label  hybrid hyb_des non-tp parent1  abs_t brchln1 parent2 brchln2 #child #dsndnt #id rank   e_num   Clade "<<endl;
-    else cout<<"            label non-tp   parent        abs_t brchln #child #dsndnt #id rank e_num   Clade "<<endl;
+    if ( this->is_Net ) cout<<"           label  hybrid hyb_des non-tp parent1  abs_t brchln1 parent2 brchln2 #child #dsndnt #id rank   edge   Clade "<<endl;
+    else cout<<"            label non-tp   parent        abs_t brchln #child #dsndnt #id rank edge   Clade "<<endl;
     for ( auto it = nodes_.iterator(); it.good(); ++it){
         //for (size_t j = 0; j < this->descndnt[i].size(); j++ ) {cout<<setw(3)<<this->descndnt[i][j];}
         (*it)->print( this->is_Net_() );
@@ -310,14 +310,14 @@ void GraphBuilder::enumerate_internal_branch( Node * node ) {
 
     if ( node->visited() ){
         this->current_enum_ ++;
-        node->set_enum2( current_enum_ );
+        node->setEdge2( current_enum_ );
     } else{
         for ( size_t i = 0; i < node->child.size(); i++ ){
             this->enumerate_internal_branch( node->child[i] );
         }
         node->set_visited( true );
         this->current_enum_ ++;
-        node->set_enum( current_enum_ );
+        node->setEdge( current_enum_ );
     }
 }
 
@@ -633,8 +633,8 @@ void GraphBuilder::rewrite_descendant(){    //check for coaleased tips(& sign in
 #ifndef NDEBUG
 bool GraphBuilder::print_all_node_dout(){
 
-    if ( is_Net ) dout<<"           label  hybrid hyb_des non-tp parent1  height brchln1 parent2 brchln2 #child #dsndnt #id rank   e_num   Clade "<<endl;
-    else dout<<"       label non-tp   parent  height brchln #child #dsndnt #id rank e_num   Clade "<<endl;
+    if ( is_Net ) dout<<"           label  hybrid hyb_des non-tp parent1  height brchln1 parent2 brchln2 #child #dsndnt #id rank   edge   Clade "<<endl;
+    else dout<<"       label non-tp   parent  height brchln #child #dsndnt #id rank edge   Clade "<<endl;
     for ( auto it = nodes_.iterator(); it.good(); ++it){
         //for (size_t j=0;j<descndnt[i].size();j++) dout<<setw(3)<<descndnt[i][j];
 

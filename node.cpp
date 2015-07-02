@@ -46,8 +46,8 @@ void Node::init(){
     this->next_     = NULL;
     this->brchlen2_ = 0.0;
     this->rank_     = 0;
-    this->e_num_    = 0;
-    this->e_num2_   = 0;
+    this->edge_    = 0;
+    this->edge2_   = 0;
     this->height_ = 1.0/0.0;
     // prob_to_hybrid_left=1.0;
     this->visited_ = false;
@@ -70,8 +70,8 @@ void Node::init(){
 	//this->brchlen1_ = 0.0;
 	//this->brchlen2_ = 0.0;
 	//this->rank_     = 0;
-	//this->e_num_    = 0;
-	//this->e_num2_   = 0;
+	//this->edge_    = 0;
+	//this->edge2_   = 0;
 	////visit=0;
 	//descndnt_of_hybrid=false;
 	//this->is_tip()=false;
@@ -102,8 +102,8 @@ void Node::print( bool is_Net ){
 	cout << setw(4) << num_descndnt_interior;
 	cout << setw(6) << this->rank() << "   ";
 	
-	cout << setw(2)<<this->e_num();
-	if ( is_Net ) cout << setw(3) << this->e_num2();
+	cout << setw(2)<<this->edge();
+	if ( is_Net ) cout << setw(3) << this->edge2();
 	cout << "    " << this->clade;
     for ( size_t i = 0; i < this->samples_below.size(); i++ ){
 		cout<<this->samples_below[i];
@@ -180,8 +180,8 @@ bool Node::print_dout( bool is_Net ){
     //for (size_t i=0;i<descndnt.size();i++){
         //dout<<setw (1)<<descndnt[i];
     //}
-    dout << setw(2)<<this->e_num();
-    if ( is_Net ) dout << setw(3) << this->e_num2();
+    dout << setw(2)<<this->edge();
+    if ( is_Net ) dout << setw(3) << this->edge2();
     dout << "    " << this->clade;
     //dout<<endl;
     return true;

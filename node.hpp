@@ -80,8 +80,8 @@ class Node {
     // Members
     size_t rank_;     /*!< \brief rank of the node, tip node has rank one, the root has the highest rank */    
     bool visited_;
-    size_t e_num_;    /*!< \brief numbering the branch */
-    size_t e_num2_;   /*!< \brief Hybrid node only, numbering the branch between the node and its second parent */
+    size_t edge_;    /*!< \brief numbering the branch */
+    size_t edge2_;   /*!< \brief Hybrid node only, numbering the branch between the node and its second parent */
     double brchlen1_; /*!< \brief Branch length */
     double brchlen2_;/*!< \brief Hybrid node only, Branch length to the second parent*/
 
@@ -115,11 +115,11 @@ class Node {
     //vector <size_t> Net_node_contains_gt_node1; /*!< Used while simulation, check if a Network node contains a gene tree node */
     //vector <size_t> Net_node_contains_gt_node2; /*!< Used while simulation, check if a Network node contains a gene tree node */
         
-    size_t e_num() const {return this->e_num_;}
-    void set_enum( size_t num ) { this->e_num_ = num; }
+    size_t edge() const {return this->edge_;}
+    void setEdge( size_t num ) { this->edge_ = num; }
     
-    size_t e_num2() const {return this->e_num2_;}
-    void set_enum2( size_t num ) { this->e_num2_ = num; }
+    size_t edge2() const {return this->edge2_;}
+    void setEdge2( size_t num ) { this->edge2_ = num; }
     
     bool visited() const { return this->visited_; }
     void set_visited ( bool TorF ){ this->visited_ = TorF; }
