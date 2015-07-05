@@ -179,7 +179,7 @@ GraphBuilder::GraphBuilder(string &in_str /*! input (extended) newick form strin
 
 void GraphBuilder::init(){
     this->tmpEdgeNameLabel_ = 0;
-    this->is_Net = false;
+    this->isNet_ = false;
     this->is_ultrametric = true;
 }
 
@@ -285,18 +285,18 @@ void GraphBuilder::connect_graph(){
 void GraphBuilder::check_isNet(){ //false stands for tree, true stands for net_work
     for ( auto it = nodes_.iterator(); it.good(); ++it){
         if ( (*it)->parent2() == NULL ) continue;
-        this->is_Net = true;
+        this->isNet_ = true;
         return;
     }
 }
 
 
 void GraphBuilder::print(){
-    if ( this->is_Net ) cout<<"           label  hybrid hyb_des non-tp parent1  abs_t brchln1 parent2 brchln2 #child #dsndnt #id rank   edge   Clade "<<endl;
+    if ( this->isNet() ) cout<<"           label  hybrid hyb_des non-tp parent1  abs_t brchln1 parent2 brchln2 #child #dsndnt #id rank   edge   Clade "<<endl;
     else cout<<"            label non-tp   parent        abs_t brchln #child #dsndnt #id rank edge   Clade "<<endl;
     for ( auto it = nodes_.iterator(); it.good(); ++it){
         //for (size_t j = 0; j < this->descndnt[i].size(); j++ ) {cout<<setw(3)<<this->descndnt[i][j];}
-        (*it)->print( this->is_Net_() );
+        (*it)->print( this->isNet() );
         cout<<"  ";
         //for (size_t j=0;j<this->samples_below[i].size();j++) {cout<<this->samples_below[i][j]; }
         cout<<endl;
@@ -632,12 +632,12 @@ void GraphBuilder::rewrite_descendant(){    //check for coaleased tips(& sign in
 #ifndef NDEBUG
 bool GraphBuilder::print_all_node_dout(){
 
-    if ( is_Net ) dout<<"           label  hybrid hyb_des non-tp parent1  height brchln1 parent2 brchln2 #child #dsndnt #id rank   edge   Clade "<<endl;
+    if ( this->isNet() ) dout<<"           label  hybrid hyb_des non-tp parent1  height brchln1 parent2 brchln2 #child #dsndnt #id rank   edge   Clade "<<endl;
     else dout<<"       label non-tp   parent  height brchln #child #dsndnt #id rank edge   Clade "<<endl;
     for ( auto it = nodes_.iterator(); it.good(); ++it){
         //for (size_t j=0;j<descndnt[i].size();j++) dout<<setw(3)<<descndnt[i][j];
 
-        assert( (*it)->print_dout( this->is_Net_() ) );
+        assert( (*it)->print_dout( this->isNet() ) );
 
         dout<<"  ";
 

@@ -68,7 +68,7 @@ class GraphBuilder{
   private:
     // Members
     bool is_ultrametric; /*!< \brief true if the distances between tips and root are equal; false, otherwise */ // This is used in Figure
-    bool is_Net; /*!< \brief true if Net is a network; false if it's a tree */
+    bool isNet_; /*!< \brief true if Net is a network; false if it's a tree */
     NodeContainer nodes_;
     GraphReader * Tree_info;
     size_t tmpEdgeNameLabel_;
@@ -91,7 +91,7 @@ class GraphBuilder{
 
     void which_taxa_is_below();
     void which_sample_is_below();
-    bool is_Net_() const { return this->is_Net ; }
+    bool isNet() const { return this->isNet_ ; }
     void print();
     bool print_all_node_dout();
     void initialize_nodes( string &net_str );
