@@ -176,6 +176,18 @@ GraphBuilder::GraphBuilder(string &in_str /*! input (extended) newick form strin
     //dout<<"Net constructed"<<endl;
 }
 
+GraphBuilder::GraphBuilder(const GraphBuilder &currentGraph){
+    this->is_ultrametric = currentGraph.is_ultrametric;
+    this->isNet_ = currentGraph.isNet_; /*!< \brief true if Net is a network; false if it's a tree */
+    this->nodes_ = NodeContainer(*currentGraph.getNodes());
+    this->Tree_info = NULL;
+    size_t tmpEdgeNameLabel_;
+    this->tip_name = currentGraph.tip_name; // maybe don't need them actually...
+    this->tax_name = currentGraph.tax_name; // maybe don't need them actually...
+    //string net_str; /*!< \brief species network string \todo this is new!!!*/
+    this->max_rank = currentGraph.max_rank;
+}
+
 
 void GraphBuilder::init(){
     this->tmpEdgeNameLabel_ = 0;

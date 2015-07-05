@@ -79,6 +79,7 @@ class Edge {
 
 class Node {
     friend class NodeIterator;
+    friend class ConstNodeIterator;
     friend class NodeContainer;
     friend class GraphBuilder;
     friend class Net;

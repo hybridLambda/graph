@@ -31,7 +31,7 @@ NodeContainer::NodeContainer() {
 }
 
 // Used for copy Trees
-NodeContainer::NodeContainer( NodeContainer &nc) {
+NodeContainer::NodeContainer( const NodeContainer &nc) {
     this->size_ = 0;
     this->last_node_ = NULL;
     this->first_node_ = NULL;

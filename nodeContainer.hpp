@@ -32,10 +32,12 @@
 //class NodeContainer;
 
 class NodeIterator;
+class ConstNodeIterator;
 
 class NodeContainer {
     friend class GraphBuilder;
     friend class NodeIterator;
+    friend class ConstNodeIterator;
     friend class CoalGT;
     friend class CoalST;
     friend class Figure;
@@ -48,10 +50,12 @@ class NodeContainer {
         return(*this);
     };
 
-    NodeContainer( NodeContainer &nc );
+    NodeContainer( const NodeContainer &nc );
 
     NodeIterator iterator();
     NodeIterator iterator( Node* node );
+    ConstNodeIterator iterator() const;
+    ConstNodeIterator iterator(Node* node) const;
 
     //private:
     friend void swap( NodeContainer& a, NodeContainer& b );
@@ -114,7 +118,45 @@ class NodeIterator {
     //double height() const { return ( this->good() ? this->current_node_->height() : DBL_MAX ); }
 };
 
+class ConstNodeIterator {
+    Node const* current_node_;
+    size_t node_index_;
+  public:
+    size_t node_index() const { return this->node_index_; }
+
+    ConstNodeIterator() { current_node_ = NULL; this->node_index_ = 0; };
+    ConstNodeIterator( const NodeContainer& nc) { current_node_ = nc.first(); };
+    ConstNodeIterator( Node const* node) { current_node_ = node; };
+    ~ConstNodeIterator() {};
+
+    Node const* operator*() {
+      if ( current_node_ == NULL ) throw std::out_of_range( "Node iterator out of range" );
+      return current_node_;
+    }
+
+    Node const* operator++() {
+      if ( current_node_ == NULL ) throw std::out_of_range( "Node iterator out of range" );
+      current_node_ = ( current_node_->is_last() ) ? NULL : current_node_->next();
+      node_index_++;
+      return current_node_;
+    }
+
+    Node const* operator--() {
+      if ( current_node_ == NULL ) throw std::out_of_range( "Node iterator out of range" );
+      current_node_ = ( current_node_->is_first() ) ? NULL : current_node_->previous();
+      node_index_--;
+      return current_node_;
+    }
+
+    bool good() const { return ( current_node_ != NULL ); }
+
+    //double height() const { return ( this->good() ? this->current_node_->height() : DBL_MAX ); }
+};
+
+
+
 inline NodeIterator NodeContainer::iterator() { return NodeIterator(*this); }
 inline NodeIterator NodeContainer::iterator(Node* node) { return NodeIterator(node); }
-
+inline ConstNodeIterator NodeContainer::iterator() const { return ConstNodeIterator(*this); }
+inline ConstNodeIterator NodeContainer::iterator(Node* node) const { return ConstNodeIterator(node); }
 #endif

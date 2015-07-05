@@ -61,6 +61,7 @@ bool start_of_tax_name(string in_str, size_t i);
 class GraphBuilder{
   friend class Net;
   friend class CoalST;
+  friend class CoalSN;
   friend class CoalGT;
   friend class HybridCoal;
   friend class Frequency;
@@ -97,8 +98,10 @@ class GraphBuilder{
     void initialize_nodes( string &net_str );
     void remove_repeated_hybrid_node();
     void connect_graph();
+    NodeContainer const *getNodes() const { return &nodes_; };
 
     GraphBuilder( string &net_str );
+    GraphBuilder(const GraphBuilder &currentGraph);
     ~GraphBuilder(){};
 
   public:
