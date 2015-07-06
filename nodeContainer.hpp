@@ -40,6 +40,7 @@ class NodeContainer {
     friend class ConstNodeIterator;
     friend class CoalGT;
     friend class CoalST;
+    friend class TmpSN;
     friend class Figure;
     //public:
     NodeContainer();

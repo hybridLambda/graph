@@ -32,7 +32,7 @@ Node::Node ( size_t max_of_taxa,
     this->nodeName = nodeName;
     this->subTreeStr = treeStr;
     this->edge1.setLength(bl);
-    this->is_tip_ = tip;
+    this->isTip_ = tip;
     // clade=" ";
 
     this->taxa_below = valarray < size_t > ( (size_t)0, max_of_taxa );
@@ -48,7 +48,7 @@ void Node::init(){
     //this->height_ = 1.0/0.0;
     // prob_to_hybrid_left=1.0;
     this->visited_ = false;
-    this->is_below_hybrid_ = false;
+    this->isBelowHybrid_ = false;
     this->num_descndnt=0;
     this->num_descndnt_interior=0;
 }
@@ -57,9 +57,9 @@ void Node::init(){
 void Node::print( bool is_Net ){
     cout << setw(7) << this->nodeName;
     cout << setw(12) << (this);
-    if ( is_Net ) cout << setw(6) << this->hybrid();
-    if ( is_Net ) cout << setw(8) << this->is_below_hybrid();
-    cout << setw(5) << this->is_tip();
+    if ( is_Net ) cout << setw(6) << this->isHybrid();
+    if ( is_Net ) cout << setw(8) << this->isBelowHybrid();
+    cout << setw(5) << this->isTip();
     if ( this->parent1() != NULL ) cout << setw (11) << ( this->parent1() );
     else cout << "           ";
     //cout << setw (12) << this->height();
@@ -102,7 +102,7 @@ void Node::add_child( Node *child_node /*! pointer to the child node*/){
  * Child node has lower rank than the parent node. Tip nodes have rank one, the root node has the highest rank
  */
 void Node::CalculateRank(){
-    if ( this->is_tip() ) {
+    if ( this->isTip() ) {
         this->rank_ = 1;
         return;
     }
@@ -121,13 +121,17 @@ void Node::CalculateRank(){
 
 
 ///*! \brief Label a node if its a descendant of a hybrid node */
-//void Node::find_hybrid_descndnt(){
-    //if ( this->is_tip() ) return;
-    //for ( size_t ith_child = 0; ith_child < this->child.size(); ith_child++){
-        //if ( this->hybrid() || this->descndnt_of_hybrid ) this->child[ith_child]->descndnt_of_hybrid = true;
-        //this->child[ith_child]->find_hybrid_descndnt();
-    //}
-//}
+void Node::findWhoIsBelowHybrid(){
+    if ( this->isTip() )
+        return;
+
+    for ( size_t childIndex = 0; childIndex < this->child.size(); childIndex++){
+        if ( this->isHybrid() || this->isBelowHybrid() )
+            this->child[childIndex]->setIsBelowHybrid( true );
+
+        this->child[childIndex]->findWhoIsBelowHybrid();
+    }
+}
 
 
 
@@ -135,9 +139,9 @@ void Node::CalculateRank(){
 
 bool Node::print_dout( bool is_Net ){
     dout << setw(12) << this;
-    if ( is_Net ) dout << setw(6) << this->hybrid();
-    if ( is_Net ) dout << setw(8) << this->is_below_hybrid();
-        dout << setw(5) << this->is_tip();
+    if ( is_Net ) dout << setw(6) << this->isHybrid();
+    if ( is_Net ) dout << setw(8) << this->isBelowHybrid();
+        dout << setw(5) << this->isTip();
     if ( this->parent1() != NULL ) dout << setw (11) << ( this->parent1() ); //if (this->parent1) dout << setw (11) << (this->parent1_());
     else dout << "           ";
     //dout << setw (6) << this->height();

@@ -63,6 +63,7 @@ class GraphBuilder{
   friend class CoalST;
   friend class CoalSN;
   friend class CoalGT;
+  friend class TmpSN;
   friend class HybridCoal;
   friend class Frequency;
   friend class Figure;

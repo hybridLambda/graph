@@ -85,6 +85,7 @@ class Node {
     friend class Net;
     friend class CoalGT;
     friend class CoalST;
+    friend class TmpSN;
     friend class simTree;
     friend class HybridLambda;
     friend class Figure;
@@ -99,7 +100,7 @@ class Node {
     string nodeName; /*!< \brief String label of a node, each node has unique name */
     //size_t node_index; /*!< \brief node index in the array, \todo use this more often!!!*/
     string subTreeStr; /*!< \brief node content, the subtree string at this node */
-    bool hybrid() const { return ( this->parent2() != NULL ) ;} /*!< \brief Hybrid node only, indicator of a hybrid node */
+    bool isHybrid() const { return ( this->parent2() != NULL ) ;} /*!< \brief Hybrid node only, indicator of a hybrid node */
 
   private:
     // Members
@@ -122,10 +123,14 @@ class Node {
     vector <double> path_time;
     //double height_; /*!< \brief distance to the bottom of the tree */  // This has no use for hybrid-coal
 
-    bool is_tip_; /*!< \brief Indicator of tip nodes. It's true, if it is a tip node, otherwise it is false. */
-    bool is_tip() const { return this->is_tip_ ;}
-    bool is_below_hybrid_; //bool descndnt_of_hybrid; /*!< \brief Indicator of descendant of hybrid nodes. It's true, if it is a descendant of hybrid nodes; false, otherwise. */
-    bool is_below_hybrid() const { return this->is_below_hybrid_; }
+    bool isTip_; /*!< \brief Indicator of tip nodes. It's true, if it is a tip node, otherwise it is false. */
+    bool isTip() const {
+        assert ( this->child.size() == 0);
+        return this->isTip_ ;
+    }
+    bool isBelowHybrid_; //bool descndnt_of_hybrid; /*!< \brief Indicator of descendant of hybrid nodes. It's true, if it is a descendant of hybrid nodes; false, otherwise. */
+    bool isBelowHybrid() const { return this->isBelowHybrid_; }
+    void setIsBelowHybrid( bool isBelow ){ this->isBelowHybrid_ = isBelow; }
 
     Node* parent2_; /*!< \brief Hybrid node only, pointer to its second parent node. */
     //double prob_to_hybrid_left; /*!< \brief Hybrid node only, the probability that a lineage goes to the left */
@@ -179,7 +184,7 @@ class Node {
     void print( bool is_Net = false );
     bool print_dout( bool is_Net = false );
     //void find_tip();
-    //void find_hybrid_descndnt();
+    void findWhoIsBelowHybrid();
     //bool find_descndnt ( string &name, NAMETYPE type );
 
     double extract_hybrid_para(){

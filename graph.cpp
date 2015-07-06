@@ -164,7 +164,7 @@ GraphBuilder::GraphBuilder(string &in_str /*! input (extended) newick form strin
     this->remove_repeated_hybrid_node();
     this->connect_graph();
 
-    //this->nodes_.back()->find_hybrid_descndnt();
+    this->nodes_.back()->findWhoIsBelowHybrid();
     this->nodes_.back()->CalculateRank();
     this->max_rank = nodes_.back()->rank();
     this->enumerate_internal_branch( this->nodes_.back() );
@@ -199,16 +199,16 @@ void GraphBuilder::init(){
 void GraphBuilder::initialize_nodes( string &in_str ){
     this->Tree_info = new GraphReader ( in_str );
     for ( size_t i = 0 ; i < Tree_info->brchlens.size(); i++ ){
-        bool is_tip = ( Tree_info->node_labels[i] == Tree_info->subTreeStrs[i] && Tree_info->node_labels[i].find("#") == string::npos);
+        bool isTip = ( Tree_info->node_labels[i] == Tree_info->subTreeStrs[i] && Tree_info->node_labels[i].find("#") == string::npos);
         Node * node = new Node ( Tree_info->tax_name.size(),
                                  Tree_info->tip_name.size(),
                                  Tree_info->node_labels[i],
                                  Tree_info->subTreeStrs[i],
                                  strtod( Tree_info->brchlens[i].c_str(), NULL),
-                                 is_tip );
+                                 isTip );
         this->nodes_.add ( node );
 
-        if ( !is_tip ) continue;
+        if ( !isTip ) continue;
 
         size_t tip_i;
         for ( tip_i = 0 ; tip_i < Tree_info->tip_name.size(); tip_i++ ){
@@ -318,7 +318,7 @@ void GraphBuilder::print(){
 
 /*! \brief enumerate the internal branches */
 void GraphBuilder::enumerate_internal_branch( Node * node ) {
-    if ( node->is_tip() ) return;
+    if ( node->isTip() ) return;
 
     if ( node->visited() ){
         this->tmpEdgeNameLabel_ ++;
@@ -365,7 +365,7 @@ size_t GraphBuilder::Parenthesis_balance_index_forwards( string &in_str, size_t 
 void GraphBuilder::which_taxa_is_below(){
     for ( auto it = nodes_.iterator(); it.good(); ++it){
         Node* current_node = (*it);
-        if ( !current_node->is_tip() ) continue;
+        if ( !current_node->isTip() ) continue;
 
         size_t taxa_i = 0;
         for ( taxa_i = 0 ; taxa_i < current_node->taxa_below.size(); taxa_i++){
@@ -383,7 +383,7 @@ void GraphBuilder::which_taxa_is_below(){
 void GraphBuilder::which_sample_is_below(){
     for ( auto it = nodes_.iterator(); it.good(); ++it){
         Node* current_node = (*it);
-        if ( !current_node->is_tip() ) continue;
+        if ( !current_node->isTip() ) continue;
 
         size_t taxa_i = 0;
         for ( taxa_i = 0 ; taxa_i < current_node->samples_below.size(); taxa_i++){
@@ -494,7 +494,7 @@ void GraphBuilder::check_isUltrametric(){
 
 string GraphBuilder::print_newick( Node * node ){
     string tree_str;
-    if ( node->is_tip() ) tree_str = node->nodeName ;
+    if ( node->isTip() ) tree_str = node->nodeName ;
     else {
         tree_str = "(";
         for ( size_t i = 0 ; i < node->child.size() ; i++ ){
@@ -577,7 +577,7 @@ string remove_interior_label(string in_str/*!< input newick form string */){
 void GraphBuilder::rewrite_descendant(){    //check for coaleased tips(& sign in the tips)
     bool rewrite_descndnt=false;
     for ( auto it = nodes_.iterator(); it.good(); ++it){
-        if ( (*it)->is_tip() ){
+        if ( (*it)->isTip() ){
             for (size_t i_str=0;i_str< (*it)->clade.size();i_str++){
                 if ((*it)->clade[i_str]=='&'){
                     rewrite_descndnt=true;
