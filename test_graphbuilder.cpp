@@ -58,7 +58,7 @@ class TestGraphBuild : public CppUnit::TestCase {
       CPPUNIT_ASSERT_NO_THROW( graph1.removeOneChildInternalNode() );
       //CPPUNIT_ASSERT_NO_THROW( graph1.print() );
       CPPUNIT_ASSERT_NO_THROW( graph1.rewrite_subTreeStr() );
-      CPPUNIT_ASSERT_EQUAL ( string("((A:1.000000,B:1.000000)Int_2:1.000000,C:2.000000)"), graph1.subTreeStrAtRoot() );
+      CPPUNIT_ASSERT_EQUAL ( string("((A:1.000000,B:1.000000)Int_2:1.000000,C:2.000000)root;"), graph1.reWritesubTreeStrAtRoot() );
     }
 
 };
