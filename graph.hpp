@@ -111,8 +111,8 @@ class GraphBuilder{
     NodeContainer *nodes() { return &(this->nodes_); } /*!< \brief array of nodes */
     void rewrite_subTreeStr();
     string print_newick( Node * node );
-    string subTreeStrAtRoot () {
-        return this->nodes_.back()->subTreeStr;
+    string reWritesubTreeStrAtRoot () {
+        return this->rewrite_internal_subTreeStr(this->nodes_.back()) + this->nodes_.back()->nodeName + ";";
     }
 };
 

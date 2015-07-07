@@ -52,6 +52,7 @@ class Edge {
   friend class Figure;
   friend class CoalST;
   friend class CoalGT;
+  friend class CoalSN;
     // For any extenal edge (connected to a tip node), the edgeName is set as zero.
     // edgeName is used to label the interior branchs of the tree
     size_t edgeName_;
