@@ -163,7 +163,6 @@ GraphBuilder::GraphBuilder(string &in_str /*! input (extended) newick form strin
     this->initialize_nodes( in_str );
     this->remove_repeated_hybrid_node();
     this->connect_graph();
-
     this->nodes_.back()->findWhoIsBelowHybrid();
     this->nodes_.back()->CalculateRank();
     this->max_rank = nodes_.back()->rank();
@@ -251,7 +250,7 @@ void GraphBuilder::remove_repeated_hybrid_node(){
 
 void GraphBuilder::connect_graph(){
     for ( auto it = nodes_.iterator(); it.good(); ++it){
-        dout << " node " << (*it) << ": " << (*it)->nodeName <<"\t"<<(*it)->subTreeStr<<endl;
+        //dout << " node " << (*it) << ": " << (*it)->nodeName <<"\t"<<(*it)->subTreeStr<<endl;
         if ( (*it)->subTreeStr[0] != '(' ) continue;
 
         char child_node1[(*it)->subTreeStr.length()];
@@ -305,7 +304,7 @@ void GraphBuilder::check_isNet(){ //false stands for tree, true stands for net_w
 
 void GraphBuilder::print(){
     if ( this->isNet() ) cout<<"           label  hybrid hyb_des non-tp parent1  abs_t brchln1 parent2 brchln2 #child #dsndnt #id rank   edge   Clade "<<endl;
-    else cout<<"            label non-tp   parent        abs_t brchln #child #dsndnt #id rank edge   Clade "<<endl;
+    else cout<<"            label non-tp   parent       brchln #child #dsndnt #id rank edge   Clade "<<endl;
     for ( auto it = nodes_.iterator(); it.good(); ++it){
         //for (size_t j = 0; j < this->descndnt[i].size(); j++ ) {cout<<setw(3)<<this->descndnt[i][j];}
         (*it)->print( this->isNet() );
@@ -399,19 +398,12 @@ void GraphBuilder::which_sample_is_below(){
 
 /*! \brief rewrite node content of nodes */
 void GraphBuilder::rewrite_subTreeStr(){
-    size_t highest_i = 0;
-    for ( auto it = nodes_.iterator(); it.good(); ++it){
-        if ( (*it)->num_descndnt > this->nodes_.at(highest_i)->num_descndnt ){ highest_i = it.node_index();}
-    }
-
-    this->nodes_.at(highest_i)->CalculateRank();
-
     for ( size_t rank_i = 1; rank_i <= this->nodes_.back()->rank(); rank_i++){
         for ( auto it = nodes_.iterator(); it.good(); ++it){
             if ( (*it)->rank() != rank_i ) continue;
 
             (*it)->subTreeStr = ( (*it)->rank() == 1 ) ? (*it)->nodeName :
-                                                           this->rewrite_internal_subTreeStr( (*it) );
+                                                         this->rewrite_internal_subTreeStr( (*it) );
         }
     }
 }
@@ -419,27 +411,27 @@ void GraphBuilder::rewrite_subTreeStr(){
 
 string GraphBuilder::rewrite_internal_subTreeStr( Node * node ){
     string new_subTreeStr="(";
-    for (size_t child_i = 0; child_i < node->child.size(); child_i++ ){
-        string brchlen_str1 = to_string ( node->child[child_i]->edge1.bl() );
-        if ( node->child[child_i]->subTreeStr == node->child[child_i]->nodeName ) {
-            new_subTreeStr += node->child[child_i]->nodeName+":" +  brchlen_str1;
+    for (size_t childIdx = 0; childIdx < node->child.size(); childIdx++ ){
+        string bl1 = to_string ( node->child[childIdx]->edge1.bl() );
+        if ( node->child[childIdx]->subTreeStr == node->child[childIdx]->nodeName ) {
+            new_subTreeStr += node->child[childIdx]->nodeName+":" +  bl1;
         }
         else {
-            bool new_hybrid_node=false;
+            bool new_hybrid_node = false;
             string brchlen_str2;
             for ( auto it = nodes_.iterator(); it.good(); ++it){
                 for ( size_t child_ii = 0; child_ii < (*it)->child.size(); child_ii++ ){
-                    if ( (*it)->child[child_ii]->subTreeStr == node->child[child_i]->subTreeStr){
-                        new_hybrid_node=true;
-                        brchlen_str2 = to_string(node->child[child_i]->edge2.bl() );
+                    if ( (*it) != node && (*it)->child[child_ii]->subTreeStr == node->child[childIdx]->subTreeStr){
+                        new_hybrid_node = true;
+                        brchlen_str2 = to_string(node->child[childIdx]->edge2.bl() );
                     break;}
                 }
                 if (new_hybrid_node){break;}
             }
-            new_subTreeStr += new_hybrid_node ? node->child[child_i]->nodeName+":" + brchlen_str2 :
-                                                  node->child[child_i]->subTreeStr + node->child[child_i]->nodeName+":" +  brchlen_str1;
+            new_subTreeStr += new_hybrid_node ? node->child[childIdx]->nodeName+":" + brchlen_str2 :
+                                                  node->child[childIdx]->subTreeStr + node->child[childIdx]->nodeName+":" +  bl1;
         }
-        if ( child_i < node->child.size() - 1 ) new_subTreeStr += ",";
+        if ( childIdx < node->child.size() - 1 ) new_subTreeStr += ",";
     }
     new_subTreeStr += ")";
     return new_subTreeStr;
@@ -537,6 +529,33 @@ void readNextStringto( string &readto, int& argc_i, int argc_, char * const* arg
     if (argc_i >= argc_) throw NotEnoughArg( argv_[argc_i-1] );
     readto = std::string(argv_[argc_i]);
     if ( readto[0] == '-' ) throw NotEnoughArg( argv_[argc_i-1] );
+}
+
+
+void GraphBuilder::removeOneChildInternalNode ( ){
+    for ( auto it = nodes_.iterator(); it.good(); ++it){
+        if ( (*it)->child.size() !=1 || (*it)->isHybrid() ) {
+            continue;
+        }
+
+        Node * removingFrom = (*it)->parent1();
+        dout <<endl<< "From parent " << removingFrom->nodeName << "( " << removingFrom->child.size() << " ) child: ";
+        int removingChildIndex = -1;
+        for ( size_t childIdx = 0; removingFrom->child.size(); childIdx++ ){
+            if ( removingFrom->child[childIdx] == (*it) ){
+                dout << (*it)->nodeName << endl;
+                removingChildIndex = childIdx;
+                break;
+            }
+        }
+        assert (removingChildIndex != -1);
+        removingFrom->child.erase(removingFrom->child.begin() + (size_t)removingChildIndex);
+        (*it)->child[0]->set_parent1(NULL);
+        removingFrom->add_child((*it)->child[0]);
+        (*it)->child[0]->edge1.setLength( (*it)->child[0]->edge1.bl() + (*it)->edge1.bl());
+        (*it)->set_parent1(NULL);
+        nodes_.remove((*it));
+    }
 }
 
 

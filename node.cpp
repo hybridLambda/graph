@@ -63,12 +63,12 @@ void Node::print( bool is_Net ){
     if ( this->parent1() != NULL ) cout << setw (11) << ( this->parent1() );
     else cout << "           ";
     //cout << setw (12) << this->height();
-    //cout << setw (12) << this->brchlen1();
-    //if (is_Net){
-        //if ( this->parent2() != NULL) cout << setw (11) << ( this->parent2() );
-        //else cout << "           ";
-        //cout<<setw (12) << this->brchlen2();
-    //}
+    cout << setw (12) << this->edge1.bl();
+    if (is_Net){
+        if ( this->parent2() != NULL) cout << setw (11) << ( this->parent2() );
+        else cout << "           ";
+        cout<<setw (12) << this->edge2.bl();
+    }
     cout << setw (7) << this->child.size();
     cout << setw (8) << num_descndnt;
     cout << setw(4) << num_descndnt_interior;

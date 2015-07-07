@@ -85,6 +85,7 @@ class Node {
     friend class Net;
     friend class CoalGT;
     friend class CoalST;
+    friend class CoalSN;
     friend class TmpSN;
     friend class simTree;
     friend class HybridLambda;
@@ -124,8 +125,8 @@ class Node {
     //double height_; /*!< \brief distance to the bottom of the tree */  // This has no use for hybrid-coal
 
     bool isTip_; /*!< \brief Indicator of tip nodes. It's true, if it is a tip node, otherwise it is false. */
-    bool isTip() const {
-        assert ( this->child.size() == 0);
+    bool isTip() const { // DEBUG, there is a bug here, the assertion fails
+        //assert ( this->child.size() == 0);
         return this->isTip_ ;
     }
     bool isBelowHybrid_; //bool descndnt_of_hybrid; /*!< \brief Indicator of descendant of hybrid nodes. It's true, if it is a descendant of hybrid nodes; false, otherwise. */

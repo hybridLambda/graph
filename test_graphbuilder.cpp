@@ -30,6 +30,7 @@ class TestGraphBuild : public CppUnit::TestCase {
 
   CPPUNIT_TEST_SUITE( TestGraphBuild );
   CPPUNIT_TEST ( testConstructor );
+  CPPUNIT_TEST ( testRemoveOneChildInternalNode );
   CPPUNIT_TEST_SUITE_END();
  private:
 
@@ -43,7 +44,21 @@ class TestGraphBuild : public CppUnit::TestCase {
     }
 
     void testConstructor(){
+      //string treeStr = "((A:1,B:1):1,C:2);";
 
+      string treeStr = "(C:2,(A:1,B:1):1);";
+      CPPUNIT_ASSERT_NO_THROW ( GraphBuilder graph1(treeStr));
+    }
+
+    void testRemoveOneChildInternalNode(){
+      string treeStr = "((C:1):1,(A:1,B:1):1);";
+      //string treeStr = "(C:2,(A:1,B:1):1);";
+      GraphBuilder graph1(treeStr);
+      //CPPUNIT_ASSERT_NO_THROW( graph1.print() );
+      CPPUNIT_ASSERT_NO_THROW( graph1.removeOneChildInternalNode() );
+      //CPPUNIT_ASSERT_NO_THROW( graph1.print() );
+      CPPUNIT_ASSERT_NO_THROW( graph1.rewrite_subTreeStr() );
+      CPPUNIT_ASSERT_EQUAL ( string("((A:1.000000,B:1.000000)Int_2:1.000000,C:2.000000)"), graph1.subTreeStrAtRoot() );
     }
 
 };

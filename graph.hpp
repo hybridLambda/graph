@@ -59,6 +59,7 @@ bool start_of_tax_name(string in_str, size_t i);
 
 
 class GraphBuilder{
+  friend class TestGraphBuild;
   friend class Net;
   friend class CoalST;
   friend class CoalSN;
@@ -91,6 +92,7 @@ class GraphBuilder{
     void check_isNet(); /*!< \brief To determin if a Net is network or not. \return is_Net */
     void check_isUltrametric(); /*!< \brief To determin if a Net is ultrametric or not. \return is_ultrametric */
 
+    void removeOneChildInternalNode();
     void which_taxa_is_below();
     void which_sample_is_below();
     bool isNet() const { return this->isNet_ ; }
@@ -109,6 +111,9 @@ class GraphBuilder{
     NodeContainer *nodes() { return &(this->nodes_); } /*!< \brief array of nodes */
     void rewrite_subTreeStr();
     string print_newick( Node * node );
+    string subTreeStrAtRoot () {
+        return this->nodes_.back()->subTreeStr;
+    }
 };
 
 
