@@ -420,16 +420,21 @@ string GraphBuilder::rewrite_internal_subTreeStr( Node * node ){
             bool new_hybrid_node = false;
             string brchlen_str2;
             for ( auto it = nodes_.iterator(); it.good(); ++it){
+                if ( (*it) == node ) break;
+
                 for ( size_t child_ii = 0; child_ii < (*it)->child.size(); child_ii++ ){
-                    if ( (*it) != node && (*it)->child[child_ii]->subTreeStr == node->child[childIdx]->subTreeStr){
+                    if ( (*it)->child[child_ii]->subTreeStr == node->child[childIdx]->subTreeStr){
                         new_hybrid_node = true;
                         brchlen_str2 = to_string(node->child[childIdx]->edge2.bl() );
-                    break;}
+                        break;
+                    }
                 }
-                if (new_hybrid_node){break;}
+                if (new_hybrid_node){
+                    break;
+                }
             }
             new_subTreeStr += new_hybrid_node ? node->child[childIdx]->nodeName+":" + brchlen_str2 :
-                                                  node->child[childIdx]->subTreeStr + node->child[childIdx]->nodeName+":" +  bl1;
+                                                node->child[childIdx]->subTreeStr + node->child[childIdx]->nodeName+":" +  bl1;
         }
         if ( childIdx < node->child.size() - 1 ) new_subTreeStr += ",";
     }

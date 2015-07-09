@@ -112,6 +112,9 @@ class GraphBuilder{
     void rewrite_subTreeStr();
     string print_newick( Node * node );
     string reWritesubTreeStrAtRoot () {
+        for ( auto it = nodes_.iterator(); it.good(); ++it){
+            dout << (*it) << " " << (*it)->nodeName << " " << (*it)->subTreeStr <<endl;
+        }
         return this->rewrite_internal_subTreeStr(this->nodes_.back()) + this->nodes_.back()->nodeName + ";";
     }
 };
