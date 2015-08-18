@@ -538,8 +538,9 @@ void readNextStringto( string &readto, int& argc_i, int argc_, char * const* arg
 
 
 void GraphBuilder::removeOneChildInternalNode ( ){
+    vector <Node*> toBeRemoved;
     for ( auto it = nodes_.iterator(); it.good(); ++it){
-        if ( (*it)->child.size() !=1 || (*it)->isHybrid() ) {
+        if ( (*it)->child.size() != (size_t)1 || (*it)->isHybrid() ) {
             continue;
         }
 
@@ -553,13 +554,17 @@ void GraphBuilder::removeOneChildInternalNode ( ){
                 break;
             }
         }
+
         assert (removingChildIndex != -1);
         removingFrom->child.erase(removingFrom->child.begin() + (size_t)removingChildIndex);
         (*it)->child[0]->set_parent1(NULL);
         removingFrom->add_child((*it)->child[0]);
         (*it)->child[0]->edge1.setLength( (*it)->child[0]->edge1.bl() + (*it)->edge1.bl());
-        (*it)->set_parent1(NULL);
-        nodes_.remove((*it));
+        toBeRemoved.push_back((*it));
+    }
+
+    for ( size_t i = 0; i < toBeRemoved.size(); i++ ){
+        nodes_.remove(toBeRemoved[i]);
     }
 }
 
