@@ -87,11 +87,9 @@ class NodeContainer {
 
 class NodeIterator {
     Node* current_node_;
-    size_t node_index_;
   public:
-    size_t node_index() const { return this->node_index_; }
 
-    NodeIterator() { this->current_node_ = NULL; this->node_index_ = 0; };
+    NodeIterator() { this->current_node_ = NULL; };
     NodeIterator( NodeContainer& nc) { this->current_node_ = nc.first(); };
     NodeIterator( Node* node) { this->current_node_ = node; };
     ~NodeIterator() {};
@@ -104,14 +102,12 @@ class NodeIterator {
     Node* operator++() {
       if ( this->current_node_ == NULL ) throw std::out_of_range( "Node iterator out of range" );
       this->current_node_ = ( this->current_node_->is_last() ) ? NULL : this->current_node_->next();
-      node_index_++;
       return this->current_node_;
     }
 
     Node* operator--() {
       if ( this->current_node_ == NULL ) throw std::out_of_range( "Node iterator out of range" );
       this->current_node_ = ( this->current_node_->is_first() ) ? NULL : this->current_node_->previous();
-      node_index_--;
       return this->current_node_;
     }
 
@@ -126,7 +122,7 @@ class ConstNodeIterator {
   public:
     size_t node_index() const { return this->node_index_; }
 
-    ConstNodeIterator() { current_node_ = NULL; this->node_index_ = 0; };
+    ConstNodeIterator() { current_node_ = NULL; };
     ConstNodeIterator( const NodeContainer& nc) { current_node_ = nc.first(); };
     ConstNodeIterator( Node const* node) { current_node_ = node; };
     ~ConstNodeIterator() {};
@@ -139,14 +135,12 @@ class ConstNodeIterator {
     Node const* operator++() {
       if ( current_node_ == NULL ) throw std::out_of_range( "Node iterator out of range" );
       current_node_ = ( current_node_->is_last() ) ? NULL : current_node_->next();
-      node_index_++;
       return current_node_;
     }
 
     Node const* operator--() {
       if ( current_node_ == NULL ) throw std::out_of_range( "Node iterator out of range" );
       current_node_ = ( current_node_->is_first() ) ? NULL : current_node_->previous();
-      node_index_--;
       return current_node_;
     }
 
