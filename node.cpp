@@ -23,6 +23,7 @@
 #include "node.hpp"
 
 Node::Node ( size_t max_of_taxa,
+             size_t max_of_tip,
              size_t max_of_sample, // number of tip
              string nodeName,
              string treeStr,
@@ -36,6 +37,7 @@ Node::Node ( size_t max_of_taxa,
     // clade=" ";
 
     this->taxa_below = valarray < size_t > ( (size_t)0, max_of_taxa );
+    this->tips_below = valarray < size_t > ( (size_t)0, max_of_tip );
     this->samples_below = valarray < size_t > ( (size_t)0, max_of_sample );
 }
 

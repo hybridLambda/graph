@@ -107,9 +107,11 @@ class Node {
   private:
     // Members
     size_t rank_;     /*!< \brief rank of the node, tip node has rank one, the root has the highest rank */
+    void setRank ( size_t rank ){ this->rank_ = rank; }
     bool visited_;
 
     valarray < size_t > taxa_below;
+    valarray < size_t > tips_below;
     valarray < size_t > samples_below; // tips_below
     vector < Node* > interior_nodes_below; /*!< \brief list of pointers to its descndent interior nodes */
     vector < Node* > child; /*!< \brief list of pointers to its child nodes */
@@ -130,6 +132,7 @@ class Node {
         //assert ( this->child.size() == 0);
         return this->isTip_ ;
     }
+    void setIsTip ( bool TorF ){ this->isTip_ = TorF; }
     bool isBelowHybrid_; //bool descndnt_of_hybrid; /*!< \brief Indicator of descendant of hybrid nodes. It's true, if it is a descendant of hybrid nodes; false, otherwise. */
     bool isBelowHybrid() const { return this->isBelowHybrid_; }
     void setIsBelowHybrid( bool isBelow ){ this->isBelowHybrid_ = isBelow; }
@@ -174,7 +177,8 @@ class Node {
     // Methods
     //Node (); /*!< \brief Initialize Node class*/
     Node ( size_t max_of_taxa,
-           size_t max_of_sample, // number of tip
+           size_t max_of_tip,
+           size_t max_of_sample,
            string nodeName,
            string content,
            double bl,

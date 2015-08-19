@@ -150,6 +150,36 @@ void GraphReader::extract_tax_and_tip_names(){
     }
     sort(tax_name.begin(), tax_name.end());
     sort(tip_name.begin(), tip_name.end());
+    this->extractSampleNames();
+}
+
+
+void GraphReader::extractSampleNames(){
+    for (size_t i = 0; i < tip_name.size(); i++){
+        // extract for & sign
+        //vector <string> new_tip_list;    
+        size_t found = min(tip_name[i].find("&"), tip_name[i].size());
+        for ( size_t ii = 0; ii < tip_name[i].size(); ii++ ){
+            sampleNames.push_back(tip_name[i].substr(ii, found - ii ));
+            ii = found;
+            found = min(tip_name[i].find("&", found+1 ), tip_name[i].size());
+        }
+        //for (size_t ii = 0 ; ii < new_tip_list.size(); ii++){
+            //bool new_tax_bool=true;
+            //string undetermin_taxname = new_tip_list[ii].substr(0,new_tip_list[ii].find("_"));
+                
+            //for (size_t tax_i = 0; tax_i < sampleNames.size(); tax_i++){
+                //if (sampleNames[tax_i] == undetermin_taxname){
+                    //new_tax_bool=false;
+                    //break;
+                //}
+            //}
+            //if (new_tax_bool){
+                //sampleNames.push_back(undetermin_taxname);
+            //}
+        //}
+    }
+    sort(sampleNames.begin(), sampleNames.end());    
 }
 
 
@@ -183,6 +213,7 @@ GraphBuilder::GraphBuilder(const GraphBuilder &currentGraph){
     size_t tmpEdgeNameLabel_;
     this->tip_name = currentGraph.tip_name; // maybe don't need them actually...
     this->tax_name = currentGraph.tax_name; // maybe don't need them actually...
+    this->sampleNames = currentGraph.sampleNames;
     //string net_str; /*!< \brief species network string \todo this is new!!!*/
     this->max_rank = currentGraph.max_rank;
 }
@@ -201,6 +232,7 @@ void GraphBuilder::initialize_nodes( string &in_str ){
         bool isTip = ( Tree_info->node_labels[i] == Tree_info->subTreeStrs[i] && Tree_info->node_labels[i].find("#") == string::npos);
         Node * node = new Node ( Tree_info->tax_name.size(),
                                  Tree_info->tip_name.size(),
+                                 Tree_info->sampleNames.size(),
                                  Tree_info->node_labels[i],
                                  Tree_info->subTreeStrs[i],
                                  strtod( Tree_info->brchlens[i].c_str(), NULL),
@@ -213,16 +245,25 @@ void GraphBuilder::initialize_nodes( string &in_str ){
         for ( tip_i = 0 ; tip_i < Tree_info->tip_name.size(); tip_i++ ){
             if ( Tree_info->tip_name[tip_i] == Tree_info->node_labels[i] ) break;
         }
-        this->nodes_.back()->samples_below[tip_i] = (size_t)1;
+        this->nodes_.back()->tips_below[tip_i] = (size_t)1;
 
         size_t taxa_i;
         for ( taxa_i = 0 ; taxa_i < Tree_info->tax_name.size(); taxa_i++ ){
             if ( Tree_info->tax_name[taxa_i] == Tree_info->node_labels[i] ) break;
         }
         this->nodes_.back()->taxa_below[taxa_i] = (size_t)1;
+
+        size_t sample_i;
+        for ( sample_i = 0 ; sample_i < Tree_info->sampleNames.size(); sample_i++ ){
+            if ( Tree_info->node_labels[i].find(Tree_info->sampleNames[sample_i]) != string::npos  ) {
+                this->nodes_.back()->samples_below[sample_i] = (size_t)1;
+            };
+        }
+
     }
     this->tax_name = Tree_info->tax_name;
     this->tip_name = Tree_info->tip_name;
+    this->sampleNames = Tree_info->sampleNames;
     delete Tree_info;
 }
 
@@ -373,7 +414,25 @@ void GraphBuilder::which_taxa_is_below(){
 
         while ( current_node->parent1() ){
             current_node->parent1()->taxa_below[taxa_i] = 1;
-            current_node =  current_node->parent1() ;
+            current_node =  current_node->parent1();
+        }
+    }
+}
+
+
+void GraphBuilder::which_tip_is_below(){
+    for ( auto it = nodes_.iterator(); it.good(); ++it){
+        Node* current_node = (*it);
+        if ( !current_node->isTip() ) continue;
+
+        size_t tip_i = 0;
+        for ( tip_i = 0 ; tip_i < current_node->tips_below.size(); tip_i++){
+            if ( current_node->tips_below[tip_i] == 1 ) break;
+        }
+
+        while ( current_node->parent1() ){
+            current_node->parent1()->tips_below[tip_i] = 1;
+            current_node =  current_node->parent1();
         }
     }
 }
@@ -383,18 +442,20 @@ void GraphBuilder::which_sample_is_below(){
     for ( auto it = nodes_.iterator(); it.good(); ++it){
         Node* current_node = (*it);
         if ( !current_node->isTip() ) continue;
-
-        size_t taxa_i = 0;
-        for ( taxa_i = 0 ; taxa_i < current_node->samples_below.size(); taxa_i++){
-            if ( current_node->samples_below[taxa_i] == 1 ) break;
+        for ( size_t sample_i = 0 ; sample_i < current_node->samples_below.size(); sample_i++ ){
+            Node * tmpNode = current_node;
+            if ( current_node->samples_below[sample_i] == 1 ) {
+                while ( current_node->parent1() ){
+                    current_node->parent1()->samples_below[sample_i] = 1;
+                    current_node =  current_node->parent1();
+                }
+            }
+            current_node = tmpNode;
         }
 
-        while ( current_node->parent1() ){
-            current_node->parent1()->samples_below[taxa_i] = 1;
-            current_node =  current_node->parent1() ;
-        }
     }
 }
+
 
 /*! \brief rewrite node content of nodes */
 void GraphBuilder::rewrite_subTreeStr(){
@@ -568,6 +629,22 @@ void GraphBuilder::removeOneChildInternalNode ( ){
     }
 }
 
+
+//void GraphBuilder::mergeClade( valarray <size_t> clade ) {
+    //vector <Node*> toBeRemoved;
+    //for ( auto it = nodes_.iterator(); it.good(); ++it){
+        //valarray <bool> comp = ( clade == (*it)->samples_below );
+        //if ( comp.min() == true ){
+            //for ( size_t child_i = 0; child_i < (*it)->child.size(); child_i ++){
+                //Node * tmpNode = (*it)->child[child_i];
+                //while (){
+                    
+                //}
+            //}
+            //break;
+        //}
+    //}
+//}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

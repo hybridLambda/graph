@@ -40,6 +40,7 @@ class GraphReader{
 
     vector <string> tip_name;
     vector <string> tax_name;
+    vector <string> sampleNames;
 
     // Methods
     GraphReader( string net_str );
@@ -48,6 +49,7 @@ class GraphReader{
     void check_Parenthesis(string &in_str);
     void check_labeled( string in_str );
     void extract_tax_and_tip_names();
+    void extractSampleNames();
     size_t Parenthesis_balance_index_backwards( string &in_str, size_t i );
     string label_interior_node(string in_str);
     string extract_One_subTreeStr( string &in_str, size_t back_parenthesis_index );
@@ -77,6 +79,7 @@ class GraphBuilder{
     size_t tmpEdgeNameLabel_;
     vector <string> tip_name; // maybe don't need them actually...
     vector <string> tax_name; // maybe don't need them actually...
+    vector <string> sampleNames;
     //string net_str; /*!< \brief species network string \todo this is new!!!*/
     size_t max_rank;
 
@@ -94,6 +97,7 @@ class GraphBuilder{
 
     void removeOneChildInternalNode();
     void which_taxa_is_below();
+    void which_tip_is_below();
     void which_sample_is_below();
     bool isNet() const { return this->isNet_ ; }
     void print();
