@@ -97,6 +97,7 @@ class GraphBuilder{
 
     void removeOneChildInternalNode();
     void removeZeroChildHybridNode();
+    void removeZeroChildInternalNode();
     void which_taxa_is_below();
     void which_tip_is_below();
     void which_sample_is_below();

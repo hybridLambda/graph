@@ -674,6 +674,43 @@ void GraphBuilder::removeZeroChildHybridNode(){
     }
 }
 
+void GraphBuilder::removeZeroChildInternalNode(){
+    dout << "removeZeroChildInternalNode" <<endl;
+    vector <Node*> toBeRemoved;
+    for ( auto it = nodes_.iterator(); it.good(); ++it){
+
+        if ( (*it)->parent1() == NULL ) {
+            break;
+        }
+
+        if ( (*it)->isTip() ) {
+            continue;
+        }
+
+        if ( (*it)->child.size() != (size_t)0 ) {
+            continue;
+        }
+
+        Node * removingFrom = (*it)->parent1();
+        dout <<endl<< " Removing From parent " << removingFrom->nodeName << "( " << removingFrom->child.size() << " ) child: ";
+        int removingChildIndex = -1;
+        for ( size_t childIdx = 0; removingFrom->child.size(); childIdx++ ){
+            if ( removingFrom->child[childIdx] == (*it) ){
+                dout << (*it)->nodeName << endl;
+                removingChildIndex = childIdx;
+                break;
+            }
+        }
+        assert (removingChildIndex != -1);
+        removingFrom->child.erase(removingFrom->child.begin() + (size_t)removingChildIndex);
+
+        toBeRemoved.push_back((*it));
+    }
+    for ( size_t i = 0; i < toBeRemoved.size(); i++ ){
+        nodes_.remove(toBeRemoved[i]);
+    }
+}
+
 
 //void GraphBuilder::mergeClade( valarray <size_t> clade ) {
     //vector <Node*> toBeRemoved;
