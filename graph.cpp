@@ -676,6 +676,7 @@ void GraphBuilder::removeZeroChildHybridNode(){
 
 void GraphBuilder::removeZeroChildInternalNode(){
     dout << "removeZeroChildInternalNode" <<endl;
+    //this->print();
     vector <Node*> toBeRemoved;
     for ( auto it = nodes_.iterator(); it.good(); ++it){
 
@@ -684,6 +685,10 @@ void GraphBuilder::removeZeroChildInternalNode(){
         }
 
         if ( (*it)->isTip() ) {
+            continue;
+        }
+
+        if ( (*it)->isHybrid() ){
             continue;
         }
 
