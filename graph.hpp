@@ -96,6 +96,7 @@ class GraphBuilder{
     void check_isUltrametric(); /*!< \brief To determin if a Net is ultrametric or not. \return is_ultrametric */
 
     void removeOneChildInternalNode();
+    void removeZeroChildHybridNode();
     void which_taxa_is_below();
     void which_tip_is_below();
     void which_sample_is_below();
@@ -116,10 +117,13 @@ class GraphBuilder{
     void rewrite_subTreeStr();
     string print_newick( Node * node );
     string reWritesubTreeStrAtRoot () {
+        dout << " reWritesubTreeStrAtRoot " << endl;
         for ( auto it = nodes_.iterator(); it.good(); ++it){
             dout << (*it) << " " << (*it)->nodeName << " " << (*it)->subTreeStr <<endl;
         }
-        return this->rewrite_internal_subTreeStr(this->nodes_.back()) + this->nodes_.back()->nodeName + ";";
+        string newTreeStr = this->rewrite_internal_subTreeStr(this->nodes_.back()) + this->nodes_.back()->nodeName + ";";
+        dout << " return new tree string: " << newTreeStr << endl;
+        return newTreeStr;
     }
 };
 
