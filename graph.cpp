@@ -458,13 +458,21 @@ void GraphBuilder::which_sample_is_below(){
 
 
 void GraphBuilder::whichInternalNodeIsBelow(){
+    this->which_tip_is_below();
     for ( auto i = nodes_.iterator(); i.good(); ++i ){
         for ( auto j = nodes_.iterator(); j.good(); ++j ){
+            if ( (*i)->rank() < 3 ) continue;
+            if ( (*j)->rank() < 2 ) continue;
             if ( (*i) == (*j) ) continue;
-
+            if ( (*i)->rank() <= (*j)->rank() ) continue;
+            //cout << "(*i) is ";
+            //(*i)->print();
+            //cout << endl;
+            //cout << "(*j) is ";
+            //(*j)->print();
+            //cout << endl;
             valarray <int> descndnt_diff = ((*i)->tips_below - (*j)->tips_below );
-            if ( descndnt_diff.min() >= 0 && (*i)->rank() > (*j)->rank() && (*j)->rank() >= 2){
-                //this->nodes_[i].num_descndnt_interior += 1 ;
+            if ( descndnt_diff.min() >= 0 ){
                 (*i)->interior_nodes_below.push_back( (*j) );
             }
         }

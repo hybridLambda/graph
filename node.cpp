@@ -79,6 +79,10 @@ void Node::print( bool is_Net ){
     //cout << setw(2)<<this->edge();
     //if ( is_Net ) cout << setw(3) << this->edge2();
     cout << "    " << this->clade;
+    for ( size_t i = 0; i < this->tips_below.size(); i++ ){
+        cout<<this->tips_below[i];
+    }
+    cout <<" ";
     for ( size_t i = 0; i < this->samples_below.size(); i++ ){
         cout<<this->samples_below[i];
     }
