@@ -457,6 +457,20 @@ void GraphBuilder::which_sample_is_below(){
 }
 
 
+void GraphBuilder::whichInternalNodeIsBelow(){
+    for ( auto i = nodes_.iterator(); i.good(); ++i ){
+        for ( auto j = nodes_.iterator(); j.good(); ++j ){
+            if ( (*i) == (*j) ) continue;
+
+            valarray <int> descndnt_diff = ((*i)->tips_below - (*j)->tips_below );
+            if ( descndnt_diff.min() >= 0 && (*i)->rank() > (*j)->rank() && (*j)->rank() >= 2){
+                //this->nodes_[i].num_descndnt_interior += 1 ;
+                (*i)->interior_nodes_below.push_back( (*j) );
+            }
+        }
+    }
+}
+
 /*! \brief rewrite node content of nodes */
 void GraphBuilder::rewrite_subTreeStr(){
     for ( size_t rank_i = 1; rank_i <= this->nodes_.back()->rank(); rank_i++){

@@ -111,7 +111,7 @@ class Node {
     bool visited_;
 
     valarray < size_t > taxa_below;
-    valarray < size_t > tips_below;
+    valarray < int > tips_below;
     valarray < size_t > samples_below; // tips_below
     vector < Node* > interior_nodes_below; /*!< \brief list of pointers to its descndent interior nodes */
     vector < Node* > child; /*!< \brief list of pointers to its child nodes */
@@ -122,7 +122,7 @@ class Node {
     string clade; /*!< \brief clade at this node, \todo this should be modified to a vector <string> */
 
     int num_descndnt; /*!< \brief number of the tip nodes, that are descendant from this node */
-    int num_descndnt_interior; /*!< \brief number of the interior nodes, that are descendant from this node \todo to be replaced by interior_nodes_below.size()? */
+    //int num_descndnt_interior; /*!< \brief number of the interior nodes, that are descendant from this node \todo to be replaced by interior_nodes_below.size()? */
     size_t NumberOfInteriorNodesBelow() const { return this->interior_nodes_below.size(); }
     vector <double> path_time;
     //double height_; /*!< \brief distance to the bottom of the tree */  // This has no use for hybrid-coal

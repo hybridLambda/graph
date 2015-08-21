@@ -37,7 +37,7 @@ Node::Node ( size_t max_of_taxa,
     // clade=" ";
 
     this->taxa_below = valarray < size_t > ( (size_t)0, max_of_taxa );
-    this->tips_below = valarray < size_t > ( (size_t)0, max_of_tip );
+    this->tips_below = valarray < int > ( (int)0, max_of_tip );
     this->samples_below = valarray < size_t > ( (size_t)0, max_of_sample );
 }
 
@@ -52,7 +52,7 @@ void Node::init(){
     this->visited_ = false;
     this->isBelowHybrid_ = false;
     this->num_descndnt=0;
-    this->num_descndnt_interior=0;
+    //this->num_descndnt_interior=0;
 }
 
 
@@ -73,7 +73,7 @@ void Node::print( bool is_Net ){
     }
     cout << setw (7) << this->child.size();
     cout << setw (8) << num_descndnt;
-    cout << setw(4) << num_descndnt_interior;
+    cout << setw(4) << NumberOfInteriorNodesBelow();
     cout << setw(6) << this->rank() << "   ";
 
     //cout << setw(2)<<this->edge();
@@ -155,7 +155,7 @@ bool Node::print_dout( bool is_Net ){
     //}
     dout << setw (7) << this->child.size();
     dout << setw (8) << num_descndnt;
-    dout << setw(4) << num_descndnt_interior;
+    dout << setw(4) << NumberOfInteriorNodesBelow();
     dout << setw(6) << this->rank() << "   ";
     //for (size_t i=0;i<descndnt.size();i++){
         //dout<<setw (1)<<descndnt[i];

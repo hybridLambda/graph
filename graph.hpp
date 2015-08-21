@@ -101,6 +101,7 @@ class GraphBuilder{
     void which_taxa_is_below();
     void which_tip_is_below();
     void which_sample_is_below();
+    void whichInternalNodeIsBelow();
     bool isNet() const { return this->isNet_ ; }
     void print();
     bool print_all_node_dout();
