@@ -255,7 +255,12 @@ void GraphBuilder::initialize_nodes( string &in_str ){
 
         size_t sample_i;
         for ( sample_i = 0 ; sample_i < Tree_info->sampleNames.size(); sample_i++ ){
-            if ( Tree_info->node_labels[i].find(Tree_info->sampleNames[sample_i]) != string::npos  ) {
+            size_t found = Tree_info->node_labels[i].find(Tree_info->sampleNames[sample_i]);
+            if ( found == string::npos  ){
+                continue;
+            }
+
+            if ( Tree_info->node_labels[i][found+Tree_info->sampleNames[sample_i].size()] == '&' || (found+Tree_info->sampleNames[sample_i].size()) == Tree_info->node_labels[i].size()) {
                 this->nodes_.back()->samples_below[sample_i] = (size_t)1;
             };
         }
@@ -442,6 +447,12 @@ void GraphBuilder::which_sample_is_below(){
     for ( auto it = nodes_.iterator(); it.good(); ++it){
         Node* current_node = (*it);
         if ( !current_node->isTip() ) continue;
+
+        size_t sample_i = 0;
+        for ( sample_i = 0 ; sample_i < current_node->samples_below.size(); sample_i++){
+            if ( current_node->samples_below[sample_i] == 1 ) break;
+        }
+
         for ( size_t sample_i = 0 ; sample_i < current_node->samples_below.size(); sample_i++ ){
             Node * tmpNode = current_node;
             if ( current_node->samples_below[sample_i] == 1 ) {
