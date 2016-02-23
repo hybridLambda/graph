@@ -157,7 +157,7 @@ void GraphReader::extract_tax_and_tip_names(){
 void GraphReader::extractSampleNames(){
     for (size_t i = 0; i < tip_name.size(); i++){
         // extract for & sign
-        //vector <string> new_tip_list;    
+        //vector <string> new_tip_list;
         size_t found = min(tip_name[i].find("&"), tip_name[i].size());
         for ( size_t ii = 0; ii < tip_name[i].size(); ii++ ){
             sampleNames.push_back(tip_name[i].substr(ii, found - ii ));
@@ -167,7 +167,7 @@ void GraphReader::extractSampleNames(){
         //for (size_t ii = 0 ; ii < new_tip_list.size(); ii++){
             //bool new_tax_bool=true;
             //string undetermin_taxname = new_tip_list[ii].substr(0,new_tip_list[ii].find("_"));
-                
+
             //for (size_t tax_i = 0; tax_i < sampleNames.size(); tax_i++){
                 //if (sampleNames[tax_i] == undetermin_taxname){
                     //new_tax_bool=false;
@@ -179,7 +179,7 @@ void GraphReader::extractSampleNames(){
             //}
         //}
     }
-    sort(sampleNames.begin(), sampleNames.end());    
+    sort(sampleNames.begin(), sampleNames.end());
 }
 
 
@@ -613,13 +613,23 @@ bool start_of_tax_name( string in_str, size_t i ){
 
 
 size_t end_of_label_or_bl( string &in_str, size_t i ){
-    for ( size_t j = i; j < in_str.size(); j++){
-        if      ( in_str[j+1] == ',' )    return j;
-        else if ( in_str[j+1] == ')' )    return j;
-        else if ( in_str[j+1] == ':' )    return j;
-        else if ( in_str[j+1] == ';' )    return j;
+    //for ( size_t j = i; j < in_str.size(); j++){
+        //if      ( in_str[j+1] == ',' )    return j;
+        //else if ( in_str[j+1] == ')' )    return j;
+        //else if ( in_str[j+1] == ':' )    return j;
+        //else if ( in_str[j+1] == ';' )    return j;
+        //else continue;
+    //}
+    assert(in_str.size() > 0);
+    size_t j = i;
+    for ( ; j < in_str.size(); j++){
+        if      ( in_str[j+1] == ',' )  break;
+        else if ( in_str[j+1] == ')' )  break;
+        else if ( in_str[j+1] == ':' )  break;
+        else if ( in_str[j+1] == ';' )  break;
         else continue;
     }
+    return j;
 }
 
 
@@ -758,7 +768,7 @@ void GraphBuilder::removeZeroChildInternalNode(){
             //for ( size_t child_i = 0; child_i < (*it)->child.size(); child_i ++){
                 //Node * tmpNode = (*it)->child[child_i];
                 //while (){
-                    
+
                 //}
             //}
             //break;
