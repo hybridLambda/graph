@@ -27,6 +27,7 @@
 struct InvalidInput : public exception {
   string src;
   string reason;
+  string throwMsg;
   InvalidInput( ){
     this->src      = "";
     this->reason   = "";
@@ -34,10 +35,10 @@ struct InvalidInput : public exception {
   InvalidInput( string str ){
     this->src      = str;
     this->reason   = "";
+    this->throwMsg = this->src;
   }
-  ~InvalidInput(){}
-  virtual const char * what ( ) const throw () {
-    string throwMsg = this->reason + this->src;
+  virtual ~InvalidInput() {}
+  virtual const char* what () const noexcept {
     return throwMsg.c_str();
   }
 };
@@ -46,6 +47,7 @@ struct InvalidInput : public exception {
 struct NotEnoughArg : public InvalidInput{
   NotEnoughArg( string str ):InvalidInput( str ){
     this->reason = "Not enough parameters when parsing option: ";
+    throwMsg = this->reason + this->src;
   }
   ~NotEnoughArg(){}
 };
@@ -54,27 +56,48 @@ struct NotEnoughArg : public InvalidInput{
 struct UnknowArg : public InvalidInput{
   UnknowArg( string str ):InvalidInput( str ){
     this->reason = "Unknow option: ";
+    throwMsg = this->reason + this->src;
   }
   ~UnknowArg(){}
 };
 
 
+struct InvalidInputFile : public InvalidInput{
+  InvalidInputFile( string str ):InvalidInput( str ){
+    this->reason = "Invalid input file: ";
+    throwMsg = this->reason + this->src;
+  }
+  ~InvalidInputFile(){}
+};
+
+
+struct WrongType : public InvalidInput{
+  WrongType( string str ):InvalidInput( str ){
+    this->reason = "Wrong type for parsing: ";
+    throwMsg = this->reason + this->src;
+  }
+  ~WrongType(){}
+};
+
+
 struct GraphException : public InvalidInput{
   GraphException( string str ):InvalidInput( str ){}
-  ~GraphException(){}
+  virtual ~GraphException(){}
 };
 
 
 struct BranchLengthUnGiven : public GraphException{
   BranchLengthUnGiven( string str ):GraphException( str ){
     this->reason = "Branch length was not provided at node : ";
-  }
+    throwMsg = this->reason + this->src;
+}
   ~BranchLengthUnGiven(){}
 };
 
 struct ParenthesisNotBalanced : public GraphException{
   ParenthesisNotBalanced( string str ):GraphException( str ){
     this->reason = "Parenthesis not balanced: ";
+    throwMsg = this->reason + this->src;
   }
   ~ParenthesisNotBalanced(){}
 };
